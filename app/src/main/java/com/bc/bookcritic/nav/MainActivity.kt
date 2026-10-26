@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.bc.book.ui.home.HomeRouter
 import com.bc.core.theme.MaterialAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 

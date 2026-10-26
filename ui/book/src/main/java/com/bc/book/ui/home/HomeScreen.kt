@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.MenuBook
 @Composable
 fun HomeScreen(
     uiState: BookListUiState,
-    onAction: (BookListAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
