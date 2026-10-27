@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rating_star_description">Rate %1$d out of %2$d stars</string>
+    <string name="select_reading_period">Select reading period</string>
+</resources>

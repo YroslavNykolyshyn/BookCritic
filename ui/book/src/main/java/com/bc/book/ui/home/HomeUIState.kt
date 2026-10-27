@@ -13,9 +13,3 @@ data class BookUiModel(
     val ratingText: String? = null,
     val coverPath: String? = null,
 )
-
-sealed interface BookListAction {
-    data object AddBookClicked : BookListAction
-    data class BookClicked(val bookId: String) : BookListAction
-    data object RetryClicked : BookListAction
-}

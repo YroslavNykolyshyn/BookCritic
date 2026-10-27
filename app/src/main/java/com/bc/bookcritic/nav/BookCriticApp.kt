@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.bc.book.ui.library.AddBookRouter
 import com.bc.book.ui.home.HomeRouter
 import com.bc.bookcritic.nav.bottom_nav.AppDestination
 import com.bc.bookcritic.nav.bottom_nav.BottomBarNavigation
@@ -27,7 +28,6 @@ fun BookCriticApp() {
     val bottomBarRoutes = AppDestination.bottomBarItems.map { it.route }
 
     val showBottomBar = currentRoute in bottomBarRoutes
-    val showFab = showBottomBar
 
     Scaffold(
         bottomBar = {
@@ -47,7 +47,7 @@ fun BookCriticApp() {
             }
         },
         floatingActionButton = {
-            if (showFab) {
+            if (showBottomBar) {
                 FloatingActionButton(
                     onClick = {
                         navController.navigate(AppDestination.AddBook.route)
@@ -79,7 +79,7 @@ fun BookCriticApp() {
             }
 
             composable(AppDestination.AddBook.route) {
-//                AddBookRoute()
+                AddBookRouter()
             }
         }
     }
