@@ -40,7 +40,7 @@ fun AppStarRatingBar(
         Text(
             text = label,
             style = MaterialTheme.typography.labelLarge,
-            color = AppTheme.colors.brown,
+            color = AppTheme.colors.primary,
             fontWeight = FontWeight.Medium,
         )
 
@@ -48,7 +48,7 @@ fun AppStarRatingBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    AppTheme.colors.fieldBackground,
+                    AppTheme.colors.inputBackground,
                     shape = RoundedCornerShape(17.dp),
                 )
                 .border(
@@ -81,7 +81,7 @@ fun AppStarRatingBar(
                                 maxRating,
                             ),
                             tint = if (isFilled) {
-                                AppTheme.colors.brown
+                                AppTheme.colors.primary
                             } else {
                                 AppTheme.colors.border
                             },
@@ -93,7 +93,7 @@ fun AppStarRatingBar(
             Text(
                 text = "${rating.toInt()}/$maxRating",
                 style = MaterialTheme.typography.bodyMedium,
-                color = AppTheme.colors.brown,
+                color = AppTheme.colors.primary,
             )
         }
     }

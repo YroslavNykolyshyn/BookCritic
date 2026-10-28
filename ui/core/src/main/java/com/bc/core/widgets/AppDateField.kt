@@ -38,7 +38,7 @@ fun AppDateField(
                 width = 1.dp,
                 color = AppTheme.colors.border,
             ),
-            color = AppTheme.colors.fieldBackground,
+            color = AppTheme.colors.inputBackground,
         ) {
             Row(
                 modifier = Modifier.padding(horizontal = 12.dp),
@@ -54,7 +54,7 @@ fun AppDateField(
                 Icon(
                     imageVector = Icons.Outlined.CalendarMonth,
                     contentDescription = null,
-                    tint = AppTheme.colors.brown,
+                    tint = AppTheme.colors.primary,
                 )
             }
         }

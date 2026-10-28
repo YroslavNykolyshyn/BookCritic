@@ -63,9 +63,9 @@ fun AppTextInput(
             minLines = minLines,
             shape = fieldShape,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = AppTheme.colors.textColor,
-                unfocusedTextColor = AppTheme.colors.textColor,
-                focusedContainerColor = AppTheme.colors.fieldBackground,
+                focusedTextColor = AppTheme.colors.textPrimary,
+                unfocusedTextColor = AppTheme.colors.textPrimary,
+                focusedContainerColor = AppTheme.colors.inputBackground,
                 unfocusedContainerColor = Color(0xFFFFFCF8),
                 focusedBorderColor = Color(0xFF79543E),
                 unfocusedBorderColor = Color(0xFFE8DED2),

@@ -37,7 +37,7 @@ fun AppDataPickerField(
         Text(
             text = stringResource(R.string.select_reading_period),
             style = MaterialTheme.typography.labelLarge,
-            color = AppTheme.colors.brown,
+            color = AppTheme.colors.primary,
             fontWeight = FontWeight.Medium,
         )
 
@@ -46,14 +46,14 @@ fun AppDataPickerField(
         ) {
             AppDateField(
                 value = startDate?.let(::formatDate) ?: "Start date",
-                valueColor = if (startDate == null) AppTheme.colors.textTint else AppTheme.colors.textColor,
+                valueColor = if (startDate == null) AppTheme.colors.textHint else AppTheme.colors.textPrimary,
                 onClick = { showStartedDatePicker = true },
                 modifier = Modifier.weight(1f),
             )
 
             AppDateField(
                 value = endDate?.let(::formatDate) ?: "End date",
-                valueColor = if (endDate == null) AppTheme.colors.textTint else AppTheme.colors.textColor,
+                valueColor = if (endDate == null) AppTheme.colors.textHint else AppTheme.colors.textPrimary,
                 onClick = { showFinishedDatePicker = true },
                 modifier = Modifier.weight(1f),
             )

@@ -8,7 +8,13 @@ data class BookEntity(
     @PrimaryKey
     val id: String,
     val title: String,
-    val isbn: String? = null,
+    val author: String,
+    val status: String,
+    val rating: Float? = null,
+    val startedDate: Long? = null,
+    val finishedDate: Long? = null,
+    val summary: String? = null,
+    val note: String? = null,
     val coverPath: String? = null,
-    val description: String? = null,
+    val bookCost: Long? = null,
 )
