@@ -14,6 +14,7 @@ class Navigation @Inject constructor() : INavigation {
         field = mutableStateListOf<NavKey>(Home)
 
     override fun goTo(destination: NavKey) {
+        if (mainBackStack.lastOrNull() == destination) return
         mainBackStack.add(destination)
     }
 
