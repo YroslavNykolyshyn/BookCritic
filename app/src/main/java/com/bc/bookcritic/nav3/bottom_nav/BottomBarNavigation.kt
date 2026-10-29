@@ -7,8 +7,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.NavKey
+import com.bc.core.navigation.Library
 import com.bc.core.theme.AppTheme.colors
+import com.bc.core.theme.MaterialAppTheme
 
 @Composable
 fun BottomBarNavigation(
@@ -44,5 +47,16 @@ fun BottomBarNavigation(
                 ),
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BottomBarNavigationPreview() {
+    MaterialAppTheme {
+        BottomBarNavigation(
+            selectedDestination = Library,
+            onDestinationClick = {},
+        )
     }
 }

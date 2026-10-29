@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -27,6 +28,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Search
@@ -37,6 +39,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,9 +54,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import com.bc.core.theme.AppTheme
+import com.bc.core.theme.AppTheme.colors
+import com.bc.core.theme.MaterialAppTheme
 
 @Composable
 fun LibraryScreen(
@@ -59,11 +67,26 @@ fun LibraryScreen(
     onAction: (LibraryUIAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = AppTheme.colors
-
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = colors.background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        topBar = {
+            LibrarySearchBar(
+                modifier = Modifier
+                    .padding(
+                        horizontal = AppTheme.dimensions.paddingTiny,
+                        vertical = AppTheme.dimensions.paddingExtraSmall
+                    ),
+                query = state.searchQuery,
+                onQueryChange = {
+                    onAction(LibraryUIAction.SearchChanged(it))
+                },
+                onFilterClick = {
+                    onAction(LibraryUIAction.FilterClicked)
+                },
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -91,18 +114,6 @@ fun LibraryScreen(
                 AppTheme.dimensions.paddingBig,
             ),
         ) {
-            item {
-                LibrarySearchBar(
-                    query = state.searchQuery,
-                    onQueryChange = {
-                        onAction(LibraryUIAction.SearchChanged(it))
-                    },
-                    onFilterClick = {
-                        onAction(LibraryUIAction.FilterClicked)
-                    },
-                )
-            }
-
             item {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -155,8 +166,6 @@ private fun LibrarySearchBar(
     onFilterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = AppTheme.colors
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -211,8 +220,6 @@ private fun LibraryBookItem(
     book: LibraryBookUiModel,
     modifier: Modifier = Modifier,
 ) {
-    val colors = AppTheme.colors
-
     var expanded by rememberSaveable(book.id) {
         mutableStateOf(false)
     }
@@ -342,14 +349,87 @@ private fun BookCoverPlaceholder() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(AppTheme.colors.surfaceVariant),
+            .background(colors.surfaceVariant),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector = Icons.Outlined.Book,
             contentDescription = "No book cover",
-            tint = AppTheme.colors.textSecondary,
+            tint = colors.textSecondary,
             modifier = Modifier.size(40.dp),
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LibraryScreenPreview() {
+    val items = listOf("item", "item", "item")
+    MaterialAppTheme {
+        Scaffold(
+            bottomBar = {
+                NavigationBar(
+                    containerColor = colors.bottomBarBackground,
+                    contentColor = colors.secondary,
+                    windowInsets = NavigationBarDefaults.windowInsets,
+                ) {
+                    items.forEach { _ ->
+                        NavigationBarItem(
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.Image,
+                                    contentDescription = "item",
+                                )
+                            },
+                            selected = false,
+                            onClick = {},
+                            enabled = false,
+                            label = {Text(text = "")},
+                            alwaysShowLabel = false,
+                        )
+                    }
+                }
+            },
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier.padding(innerPadding),
+            ) {
+                LibraryScreen(
+                    state = LibraryUiState(
+                        searchQuery = "",
+                        books = listOf(
+                            LibraryBookUiModel(
+                                id = "1",
+                                title = "The Midnight Library",
+                                author = "Matt Haig",
+                                rating = 4.5f,
+                                coverPath = null,
+                                bookSummary = "",
+                                bookOptionalSummary = "",
+                            ),
+                            LibraryBookUiModel(
+                                id = "2",
+                                title = "Atomic Habits",
+                                author = "James Clear",
+                                rating = 5f,
+                                coverPath = null,
+                                bookSummary = "",
+                                bookOptionalSummary = "",
+                            ),
+                            LibraryBookUiModel(
+                                id = "3",
+                                title = "1984",
+                                author = "George Orwell",
+                                rating = 4f,
+                                coverPath = null,
+                                bookSummary = "",
+                                bookOptionalSummary = "",
+                            ),
+                        ),
+                    ),
+                    onAction = {},
+                )
+            }
+        }
     }
 }

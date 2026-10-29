@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.bc.bookcritic.nav3.bottom_nav.BottomBarNavigation
 import com.bc.core.navigation.EntryProviderInstaller
@@ -40,6 +42,10 @@ fun BookCriticApp(
             backStack = navigation.mainBackStack,
             onBack = navigation::goBack,
             modifier = Modifier.padding(innerPadding),
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator(),
+            ),
             entryProvider = entryProvider {
                 entryProviderInstallers.forEach { installer ->
                     installer()
