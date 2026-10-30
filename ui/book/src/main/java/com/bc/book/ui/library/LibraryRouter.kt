@@ -6,13 +6,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun AddBookRouter(
-    viewModel: AddBookViewModel = hiltViewModel(),
+fun LibraryRouter(
+    viewModel: LibraryViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    AddBookScreen(
+    LibraryScreen(
         state = state,
-        onAction = viewModel::onAction,
+        onAction = viewModel::onAction
     )
 }

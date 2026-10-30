@@ -7,22 +7,22 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 
 private fun AppColors.toColorScheme() = lightColorScheme(
-    primary = brown,
-    onPrimary = parchment,
+    primary = primary,
+    onPrimary = surface,
 
-    secondary = taupe,
-    onSecondary = textColor,
+    secondary = secondary,
+    onSecondary = textPrimary,
 
-    background = ivory,
-    onBackground = textColor,
+    background = background,
+    onBackground = textPrimary,
 
-    surface = parchment,
-    onSurface = textColor,
+    surface = surface,
+    onSurface = textPrimary,
 
-    surfaceVariant = cream,
-    onSurfaceVariant = textColor,
+    surfaceVariant = surfaceVariant,
+    onSurfaceVariant = textPrimary,
 
-    outline = warmGray,
+    outline = outline,
 )
 
 object AppTheme {

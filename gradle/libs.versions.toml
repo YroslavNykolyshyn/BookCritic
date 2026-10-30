@@ -16,6 +16,8 @@ lifecycle = "2.11.0"
 hilt = "2.60.1"
 media3Effect = "1.11.1"
 coil = "3.6.3"
+navigation3Runtime = "1.2.0"
+navigation3Ui = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,6 +50,8 @@ compose-material-icons-extended = { group = "androidx.compose.material", name = 
 androidx-media3-effect = { group = "androidx.media3", name = "media3-effect", version.ref = "media3Effect" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
+androidx-navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runtime", version.ref = "navigation3Runtime" }
+androidx-navigation3-ui = { group = "androidx.navigation3", name = "navigation3-ui", version.ref = "navigation3Ui" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
