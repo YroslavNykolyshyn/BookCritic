@@ -15,7 +15,7 @@ data class BookData(
 )
 
 enum class ReadingStatus(val value: String) {
-    TO_READ("To read"),
-    READING("Reading"),
-    ALREADY_READ("Already read"),
+    TO_READ("to_read"),
+    READING("reading"),
+    ALREADY_READ("already_read"),
 }

@@ -43,6 +43,6 @@ interface BookDao {
     )
     fun searchBooks(query: String): Flow<List<BookEntity>>
 
-    @Query("SELECT COUNT(*) FROM book")
+    @Query("SELECT COUNT(*) FROM book WHERE status = 'ALREADY_READ'")
     fun observeBookCount(): Flow<Int>
 }

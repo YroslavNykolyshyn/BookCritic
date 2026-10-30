@@ -1,12 +1,12 @@
 package com.bc.book.ui.library.add
 
-import android.net.Uri
 import com.bc.model.repository.ReadingStatus
 
 data class AddBookUiState(
     val isSaving: Boolean = false,
     val bookItem: AddBookItem = AddBookItem(),
-)
+    val readBookCount: Int = 0,
+    )
 
 data class AddBookItem(
     val title: String = "",
@@ -17,7 +17,6 @@ data class AddBookItem(
     val finishedDate: Long? = null,
     val summary: String = "",
     val note: String = "",
-    val coverUri: Uri? = null,
+    val coverUri: String = "",
     val bookCost: String = "",
-    val readBookCount: Int = 3,
 )

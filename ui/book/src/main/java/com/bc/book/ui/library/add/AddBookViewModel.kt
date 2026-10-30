@@ -1,11 +1,12 @@
 package com.bc.book.ui.library.add
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bc.core.navigation.INavigation
 import com.bc.model.repository.BookData
-import com.bc.model.repository.BookRepository
+import com.bc.model.repository.IBookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,12 +19,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddBookViewModel @Inject constructor(
-    private val bookRepository: BookRepository,
+    private val bookRepository: IBookRepository,
     private val navigation: INavigation,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddBookUiState())
     val uiState: StateFlow<AddBookUiState> = _uiState.asStateFlow()
+
+    init {
+        observeReadBookCount()
+    }
 
     fun onAction(action: AddBookUIAction) {
         when (action) {
@@ -33,9 +38,7 @@ class AddBookViewModel @Inject constructor(
             }
 
             is AddBookUIAction.CoverSelected -> {
-                updateBookItem {
-                    copy(coverUri = action.uri)
-                }
+                saveCover(action.uri)
             }
 
             AddBookUIAction.SaveClicked -> {
@@ -96,7 +99,7 @@ class AddBookViewModel @Inject constructor(
                     finishedDate = state.finishedDate,
                     summary = state.summary.trim(),
                     note = state.note.trim(),
-                    coverPath = state.coverUri?.toString(),
+                    coverPath = state.coverUri,
                     bookCost = state.bookCost.trim().toLongOrNull(),
                 )
 
@@ -107,6 +110,30 @@ class AddBookViewModel @Inject constructor(
                     Log.d(TAG, "saveBook: error message: $e")
             } finally {
                 _uiState.update { it.copy(isSaving = false) }
+            }
+        }
+    }
+
+    private fun saveCover(uri: Uri) {
+        viewModelScope.launch {
+            runCatching {
+                bookRepository.saveBookCover(uri)
+            }.onSuccess { path ->
+                updateBookItem {
+                    copy(coverUri = path)
+                }
+            }
+        }
+    }
+
+    private fun observeReadBookCount() {
+        viewModelScope.launch {
+            bookRepository.observeBooksCount().collect { count ->
+                _uiState.update { state ->
+                    state.copy(
+                        readBookCount = count
+                    )
+                }
             }
         }
     }
