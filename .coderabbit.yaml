@@ -25,58 +25,59 @@ reviews:
     - "!**/*.lock"
     - "!**/local.properties"
 
-  instructions: |
-    Project context:
-    - This is BookCritic, an offline-first Android book journal.
-    - The app is built with Kotlin, Jetpack Compose, Material 3, Coroutines/Flow,
-      Room, Hilt, Coil 3, and Navigation 3.
-    - The presentation layer uses ViewModels and immutable UI state with
-      action/event handling.
-    - The app currently stores user data locally. Do not assume authentication,
-      cloud sync, or a backend exists or is required.
-    - Book cover images are stored as files in app-private storage. Room should
-      store a path/reference, not image byte arrays. Photo Picker and camera URIs
-      may be temporary; copy selected images into app-owned storage before
-      relying on them later.
-
-    Review priorities:
-    1. Find real bugs, crashes, data loss, security/privacy problems, lifecycle
-       issues, and incorrect behavior before style improvements.
-    2. Check coroutine cancellation, dispatcher usage, Flow collection,
-       duplicate collection, and lifecycle-aware UI observation.
-    3. Check that Composables remain UI-focused. Business logic and persistence
-       belong in ViewModels/repositories/data sources as appropriate.
-    4. Check immutable UI state updates and ensure loading, empty, success, and
-       error states are handled consistently.
-    5. Check Room queries, transactions, type converters, schema changes, and
-       migration safety. Never suggest destructive migrations for user data
-       without explicitly explaining the data-loss consequence.
-    6. Check file operations for cleanup, failure handling, path safety, and
-       consistency between database records and stored files.
-    7. Check image loading for null/invalid models, large image memory usage,
-       unnecessary recomposition/subcomposition, and temporary URI permissions.
-    8. Check dependency injection scopes and module boundaries. Avoid introducing
-       abstractions or modules without a concrete benefit.
-    9. Check accessibility, content descriptions, touch targets, and adaptive
-       layouts in Compose UI.
-    10. Check tests for meaningful behavior and edge cases. Follow the project's
-        existing testing libraries and conventions rather than adding new
-        dependencies without a reason.
-
-    Do not:
-    - Report formatting, import ordering, naming preferences, or minor stylistic
-      differences unless they cause a concrete problem.
-    - Recommend replacing an established project pattern merely because another
-      pattern is also valid.
-    - Suggest adding authentication, networking, analytics, or cloud sync unless
-      the change explicitly requires it.
-    - Treat every nullable value as a bug; assess whether null is a valid state.
-    - Request tests for trivial getters, data holders, or generated code.
-    - Repeat the same finding in multiple comments.
-    - Make claims about APIs or library behavior unless supported by the code
-      context or known framework behavior.
-
   path_instructions:
+    - path: "**/*"
+      instructions: |
+        Project context:
+        - This is BookCritic, an offline-first Android book journal.
+        - The app is built with Kotlin, Jetpack Compose, Material 3, Coroutines/Flow,
+          Room, Hilt, Coil 3, and Navigation 3.
+        - The presentation layer uses ViewModels and immutable UI state with
+          action/event handling.
+        - The app currently stores user data locally. Do not assume authentication,
+          cloud sync, or a backend exists or is required.
+        - Book cover images are stored as files in app-private storage. Room should
+          store a path/reference, not image byte arrays. Photo Picker and camera URIs
+          may be temporary; copy selected images into app-owned storage before
+          relying on them later.
+
+        Review priorities:
+        1. Find real bugs, crashes, data loss, security/privacy problems, lifecycle
+           issues, and incorrect behavior before style improvements.
+        2. Check coroutine cancellation, dispatcher usage, Flow collection,
+           duplicate collection, and lifecycle-aware UI observation.
+        3. Check that Composables remain UI-focused. Business logic and persistence
+           belong in ViewModels/repositories/data sources as appropriate.
+        4. Check immutable UI state updates and ensure loading, empty, success, and
+           error states are handled consistently.
+        5. Check Room queries, transactions, type converters, schema changes, and
+           migration safety. Never suggest destructive migrations for user data
+           without explicitly explaining the data-loss consequence.
+        6. Check file operations for cleanup, failure handling, path safety, and
+           consistency between database records and stored files.
+        7. Check image loading for null/invalid models, large image memory usage,
+           unnecessary recomposition/subcomposition, and temporary URI permissions.
+        8. Check dependency injection scopes and module boundaries. Avoid introducing
+           abstractions or modules without a concrete benefit.
+        9. Check accessibility, content descriptions, touch targets, and adaptive
+           layouts in Compose UI.
+        10. Check tests for meaningful behavior and edge cases. Follow the project's
+            existing testing libraries and conventions rather than adding new
+            dependencies without a reason.
+
+        Do not:
+        - Report formatting, import ordering, naming preferences, or minor stylistic
+          differences unless they cause a concrete problem.
+        - Recommend replacing an established project pattern merely because another
+          pattern is also valid.
+        - Suggest adding authentication, networking, analytics, or cloud sync unless
+          the change explicitly requires it.
+        - Treat every nullable value as a bug; assess whether null is a valid state.
+        - Request tests for trivial getters, data holders, or generated code.
+        - Repeat the same finding in multiple comments.
+        - Make claims about APIs or library behavior unless supported by the code
+          context or known framework behavior.
+
     - path: "**/*ViewModel.kt"
       instructions: |
         Review state ownership and event handling. Ensure UI state is exposed
