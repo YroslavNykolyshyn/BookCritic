@@ -33,12 +33,11 @@ class AddBookViewModel @Inject constructor(
     fun onAction(action: AddBookUIAction) {
         when (action) {
             AddBookUIAction.BackClicked -> {
-                clearState()
                 navigation.goBack()
             }
 
             is AddBookUIAction.CoverSelected -> {
-                saveCover(action.uri)
+                onCoverSelected(action.uri)
             }
 
             AddBookUIAction.SaveClicked -> {
@@ -82,47 +81,52 @@ class AddBookViewModel @Inject constructor(
     }
 
     private fun saveBook() {
-        val state = _uiState.value.bookItem
+        val state = _uiState.value
 
-        val title = state.title.trim()
+        if (state.isSaving) return
+
+        val item = state.bookItem
+        val title = item.title.trim()
+
         if (title.isBlank()) return
 
         viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true) }
+
             try {
                 val book = BookData(
                     id = UUID.randomUUID().toString(),
                     title = title,
-                    author = state.author.trim(),
-                    status = state.status,
-                    rating = state.rating,
-                    startedDate = state.startedDate,
-                    finishedDate = state.finishedDate,
-                    summary = state.summary.trim(),
-                    note = state.note.trim(),
-                    coverPath = state.coverUri,
-                    bookCost = state.bookCost.trim().toLongOrNull(),
+                    author = item.author.trim(),
+                    status = item.status,
+                    rating = item.rating,
+                    startedDate = item.startedDate,
+                    finishedDate = item.finishedDate,
+                    summary = item.summary.trim(),
+                    note = item.note.trim(),
+                    coverPath = null,
+                    bookCost = item.bookCost.trim().toLongOrNull(),
                 )
 
-                bookRepository.saveBook(book)
-                clearState()
+                val selectedCoverUri = item.selectedCoverUri
+                    ?.let(Uri::parse)
+
+                bookRepository.saveBook(
+                    book = book,
+                    selectedCoverUri = selectedCoverUri,
+                )
                 navigation.goBack()
             } catch (e: Exception) {
-                    Log.d(TAG, "saveBook: error message: $e")
+                Log.e(TAG, "Failed to save book", e)
             } finally {
                 _uiState.update { it.copy(isSaving = false) }
             }
         }
     }
 
-    private fun saveCover(uri: Uri) {
-        viewModelScope.launch {
-            runCatching {
-                bookRepository.saveBookCover(uri)
-            }.onSuccess { path ->
-                updateBookItem {
-                    copy(coverUri = path)
-                }
-            }
+    private fun onCoverSelected(uri: Uri) {
+        updateBookItem {
+            copy(selectedCoverUri = uri.toString())
         }
     }
 
@@ -154,11 +158,6 @@ class AddBookViewModel @Inject constructor(
         }
     }
 
-    private fun clearState() {
-        _uiState.update {
-            AddBookUiState()
-        }
-    }
     companion object {
         private const val TAG = "AddBookViewModel"
     }

@@ -17,6 +17,6 @@ data class AddBookItem(
     val finishedDate: Long? = null,
     val summary: String = "",
     val note: String = "",
-    val coverUri: String = "",
+    val selectedCoverUri: String? = null,
     val bookCost: String = "",
 )

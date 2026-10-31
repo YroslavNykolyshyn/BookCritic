@@ -1,6 +1,7 @@
 package com.bc.model.repository
 
 import android.net.Uri
+import android.util.Log
 import com.bc.database.BookDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -24,8 +25,35 @@ class BookRepository @Inject constructor(
     override suspend fun getBook(id: String): BookData? =
         dao.getBookById(id)?.toDomain()
 
-    override suspend fun saveBook(bookDataEntity: BookData) {
-        dao.insertBook(bookDataEntity.toEntity())
+    override suspend fun saveBook(
+        book: BookData,
+        selectedCoverUri: Uri?,
+    ) {
+        val savedCoverPath = selectedCoverUri?.let {
+            coverStorage.save(it)
+        }
+
+        try {
+            val bookToSave = book.copy(
+                coverPath = savedCoverPath,
+            )
+
+            dao.insertBook(bookToSave.toEntity())
+        } catch (e: Exception) {
+            savedCoverPath?.let { path ->
+                runCatching {
+                    coverStorage.delete(path)
+                }.onFailure { cleanupError ->
+                    Log.e(
+                        TAG,
+                        "Failed to clean up cover after book save failure",
+                        cleanupError,
+                    )
+                }
+            }
+
+            throw e
+        }
     }
 
     override suspend fun deleteBook(book: BookData) {
@@ -35,7 +63,7 @@ class BookRepository @Inject constructor(
         }
     }
 
-    override suspend fun saveBookCover(uri: Uri): String {
-        return coverStorage.save(uri)
+    companion object {
+        private const val TAG = "BookRepository"
     }
 }

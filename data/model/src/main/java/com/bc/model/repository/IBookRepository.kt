@@ -8,8 +8,9 @@ interface IBookRepository {
 
     suspend fun observeBooksCount(): Flow<Int>
     suspend fun getBook(id: String): BookData?
-    suspend fun saveBook(bookDataEntity: BookData)
+    suspend fun saveBook(
+        book: BookData,
+        selectedCoverUri: Uri?,
+    )
     suspend fun deleteBook(book: BookData)
-
-    suspend fun saveBookCover(uri: Uri): String
 }

@@ -59,6 +59,7 @@ import com.bc.book.R
 import com.bc.core.theme.AppTheme
 import com.bc.core.theme.AppTheme.colors
 import com.bc.core.utils.CameraImageProvider.createImageUri
+import com.bc.core.widgets.AppCircularLoadingIndicator
 import com.bc.core.widgets.AppDataPickerField
 import com.bc.core.widgets.AppStarRatingBar
 import com.bc.core.widgets.AppTextInput
@@ -109,6 +110,7 @@ fun AddBookScreen(
                 onAction = {
                     onAction(AddBookUIAction.BackClicked)
                 },
+                enabled = !state.isSaving,
             )
         },
         bottomBar = {
@@ -133,6 +135,7 @@ fun AddBookScreen(
                             containerColor = colors.primary,
                             contentColor = Color.White,
                         ),
+                        enabled = !state.isSaving,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
@@ -213,9 +216,9 @@ fun AddBookScreen(
                             },
                         contentAlignment = Alignment.Center,
                     ) {
-                        if (state.bookItem.coverUri.isNotBlank()) {
+                        if (!state.bookItem.selectedCoverUri.isNullOrBlank()) {
                             AsyncImage(
-                                model = state.bookItem.coverUri,
+                                model = state.bookItem.selectedCoverUri,
                                 contentDescription = "Book cover",
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop,
@@ -310,6 +313,10 @@ fun AddBookScreen(
                     },
                 )
             }
+        }
+
+        if (state.isSaving) {
+            AppCircularLoadingIndicator(transparentBackground = true)
         }
     }
 }
