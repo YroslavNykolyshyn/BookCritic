@@ -49,6 +49,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -64,6 +65,8 @@ import com.bc.core.theme.AppTheme
 import com.bc.core.theme.AppTheme.colors
 import com.bc.core.theme.MaterialAppTheme
 import com.bc.core.widgets.AppCircularLoadingIndicator
+import com.bc.core.widgets.BookSwipeReveal
+import com.bc.core.widgets.SwipeableBookItem
 
 @Composable
 fun LibraryScreen(
@@ -71,6 +74,9 @@ fun LibraryScreen(
     onAction: (LibraryUIAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var activeSwipe by remember {
+        mutableStateOf<BookSwipeReveal?>(null)
+    }
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = colors.background,
@@ -163,9 +169,22 @@ fun LibraryScreen(
                         items = state.books,
                         key = { it.id },
                     ) { book ->
-                        LibraryBookItem(
-                            book = book,
-                        )
+                        SwipeableBookItem(
+                            bookId = book.id,
+                            activeSwipe = activeSwipe,
+                            onRevealChange = { activeSwipe = it },
+                            onPinClick = {
+                                // TODO: Handle pin action
+                            },
+                            onEditClick = {
+                                // TODO: Handle edit action
+                            },
+                        ) { cardModifier ->
+                            LibraryBookItem(
+                                book = book,
+                                modifier = cardModifier,
+                            )
+                        }
                     }
 
                 }
@@ -242,7 +261,6 @@ private fun LibraryBookItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(28.dp))
             .background(colors.surfaceVariant)
             .animateContentSize(
                 animationSpec = spring(
