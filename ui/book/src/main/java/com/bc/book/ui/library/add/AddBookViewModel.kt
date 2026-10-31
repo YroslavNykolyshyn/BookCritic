@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
@@ -41,7 +42,7 @@ class AddBookViewModel @Inject constructor(
             }
 
             AddBookUIAction.SaveClicked -> {
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.Main.immediate) {
                     saveBook()
                 }
             }
@@ -80,7 +81,7 @@ class AddBookViewModel @Inject constructor(
         }
     }
 
-    private fun saveBook() {
+    private suspend fun saveBook() {
         val state = _uiState.value
 
         if (state.isSaving) return
@@ -90,37 +91,40 @@ class AddBookViewModel @Inject constructor(
 
         if (title.isBlank()) return
 
-        viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true) }
+        // Set the guard before the first suspension.
+        _uiState.update { it.copy(isSaving = true) }
 
-            try {
-                val book = BookData(
-                    id = UUID.randomUUID().toString(),
-                    title = title,
-                    author = item.author.trim(),
-                    status = item.status,
-                    rating = item.rating,
-                    startedDate = item.startedDate,
-                    finishedDate = item.finishedDate,
-                    summary = item.summary.trim(),
-                    note = item.note.trim(),
-                    coverPath = null,
-                    bookCost = item.bookCost.trim().toLongOrNull(),
-                )
+        try {
+            val book = BookData(
+                id = UUID.randomUUID().toString(),
+                title = title,
+                author = item.author.trim(),
+                status = item.status,
+                rating = item.rating,
+                startedDate = item.startedDate,
+                finishedDate = item.finishedDate,
+                summary = item.summary.trim(),
+                note = item.note.trim(),
+                coverPath = null,
+                bookCost = item.bookCost.trim().toLongOrNull(),
+            )
 
-                val selectedCoverUri = item.selectedCoverUri
-                    ?.let(Uri::parse)
+            val selectedCoverUri = item.selectedCoverUri
+                ?.let(Uri::parse)
 
+            withContext(Dispatchers.IO) {
                 bookRepository.saveBook(
                     book = book,
                     selectedCoverUri = selectedCoverUri,
                 )
-                navigation.goBack()
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to save book", e)
-            } finally {
-                _uiState.update { it.copy(isSaving = false) }
             }
+
+            navigation.goBack()
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to save book", e)
+        } finally {
+            _uiState.update { it.copy(isSaving = false) }
         }
     }
 
