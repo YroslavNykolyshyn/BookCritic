@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,11 +28,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.Tune
@@ -54,12 +56,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.AsyncImage
 import com.bc.core.theme.AppTheme
 import com.bc.core.theme.AppTheme.colors
 import com.bc.core.theme.MaterialAppTheme
+import com.bc.core.widgets.AppCircularLoadingIndicator
 
 @Composable
 fun LibraryScreen(
@@ -102,57 +106,68 @@ fun LibraryScreen(
             }
         },
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentPadding = PaddingValues(
-                horizontal = AppTheme.dimensions.paddingBig,
-                vertical = AppTheme.dimensions.paddingMedium,
-            ),
-            verticalArrangement = Arrangement.spacedBy(
-                AppTheme.dimensions.paddingBig,
-            ),
-        ) {
-            item {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(
-                        text = "YOUR LITTLE ESCAPE",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = colors.primary,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-
-                    Text(
-                        text = "Already read",
-                        style = MaterialTheme.typography.displaySmall,
-                        color = colors.textPrimary,
-                        fontWeight = FontWeight.Bold,
-                    )
-
-                    Text(
-                        text = "A quiet record of the stories you've finished, " +
-                                "with the covers and ratings that stayed with you.",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = colors.textSecondary,
-                    )
-                }
+        when {
+            state.isLoading -> {
+                AppCircularLoadingIndicator()
             }
 
-            if (state.books.isEmpty()) {
-                item {
-                    //  EmptyLibraryState()
-                }
-            } else {
-                items(
-                    items = state.books,
-                    key = { it.id },
-                ) { book ->
-                    LibraryBookItem(
-                        book = book,
-                    )
+            state.books.isEmpty() -> {
+                EmptyBooksContent(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                )
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentPadding = PaddingValues(
+                        horizontal = AppTheme.dimensions.paddingBig,
+                        vertical = AppTheme.dimensions.paddingMedium,
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(
+                        AppTheme.dimensions.paddingBig,
+                    ),
+                ) {
+                    item {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text(
+                                text = "YOUR LITTLE ESCAPE",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = colors.primary,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+
+                            Text(
+                                text = "Already read",
+                                style = MaterialTheme.typography.displaySmall,
+                                color = colors.textPrimary,
+                                fontWeight = FontWeight.Bold,
+                            )
+
+                            Text(
+                                text = "A quiet record of the stories you've finished, " +
+                                        "with the covers and ratings that stayed with you.",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = colors.textSecondary,
+                            )
+                        }
+                    }
+
+                    items(
+                        items = state.books,
+                        key = { it.id },
+                    ) { book ->
+                        LibraryBookItem(
+                            book = book,
+                        )
+                    }
+
                 }
             }
         }
@@ -328,35 +343,46 @@ private fun BookCover(
     book: LibraryBookUiModel,
     modifier: Modifier = Modifier,
 ) {
-    SubcomposeAsyncImage(
-        model = book.coverPath.takeUnless { it.isNullOrBlank() },
+    AsyncImage(
+        model = book.coverPath?.takeIf { it.isNotBlank() },
         contentDescription = "${book.title} cover",
         modifier = modifier
             .size(width = 100.dp, height = 136.dp)
             .clip(RoundedCornerShape(5.dp)),
         contentScale = ContentScale.Crop,
-        loading = {
-            BookCoverPlaceholder()
-        },
-        error = {
-            BookCoverPlaceholder()
-        },
     )
 }
 
 @Composable
-private fun BookCoverPlaceholder() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colors.surfaceVariant),
-        contentAlignment = Alignment.Center,
+private fun EmptyBooksContent(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            imageVector = Icons.Outlined.Book,
-            contentDescription = "No book cover",
-            tint = colors.textSecondary,
-            modifier = Modifier.size(40.dp),
+            imageVector = Icons.AutoMirrored.Filled.MenuBook,
+            contentDescription = null,
+            modifier = Modifier.size(72.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = "Your library is empty",
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text = "Add your first book and start tracking your reading journey.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -384,7 +410,7 @@ private fun LibraryScreenPreview() {
                             selected = false,
                             onClick = {},
                             enabled = false,
-                            label = {Text(text = "")},
+                            label = { Text(text = "") },
                             alwaysShowLabel = false,
                         )
                     }
@@ -396,6 +422,7 @@ private fun LibraryScreenPreview() {
             ) {
                 LibraryScreen(
                     state = LibraryUiState(
+                        isLoading = false,
                         searchQuery = "",
                         books = listOf(
                             LibraryBookUiModel(

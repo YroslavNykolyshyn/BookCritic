@@ -1,5 +1,6 @@
 package com.bc.book.ui.library.add
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,19 +27,29 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.AddPhotoAlternate
+import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -47,6 +58,8 @@ import coil3.compose.AsyncImage
 import com.bc.book.R
 import com.bc.core.theme.AppTheme
 import com.bc.core.theme.AppTheme.colors
+import com.bc.core.utils.CameraImageProvider.createImageUri
+import com.bc.core.widgets.AppCircularLoadingIndicator
 import com.bc.core.widgets.AppDataPickerField
 import com.bc.core.widgets.AppStarRatingBar
 import com.bc.core.widgets.AppTextInput
@@ -60,11 +73,29 @@ fun AddBookScreen(
     onAction: (AddBookUIAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val imagePickerLauncher = rememberLauncherForActivityResult(
+    var showImageSourceSheet by remember {
+        mutableStateOf(false)
+    }
+
+    val context = LocalContext.current
+
+    val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
     ) { uri ->
         uri?.let {
             onAction(AddBookUIAction.CoverSelected(it))
+        }
+    }
+
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+    ) { success ->
+        if (success) {
+            cameraUri?.let {
+                onAction(AddBookUIAction.CoverSelected(it))
+            }
         }
     }
 
@@ -79,6 +110,7 @@ fun AddBookScreen(
                 onAction = {
                     onAction(AddBookUIAction.BackClicked)
                 },
+                enabled = !state.isSaving,
             )
         },
         bottomBar = {
@@ -103,6 +135,7 @@ fun AddBookScreen(
                             containerColor = colors.primary,
                             contentColor = Color.White,
                         ),
+                        enabled = !state.isSaving,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
@@ -116,12 +149,35 @@ fun AddBookScreen(
                     }
 
                     Text(
-                        text = "Your read shelf has ${state.bookItem.readBookCount} books. Make it ${state.bookItem.readBookCount + 1}.",
+                        text = "Your read shelf has ${state.readBookCount} books. Make it ${state.readBookCount + 1}.",
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.secondary,
                         textAlign = TextAlign.Center,
                     )
                 }
+            }
+            if (showImageSourceSheet) {
+                ImageSourceBottomSheet(
+                    onGalleryClick = {
+                        showImageSourceSheet = false
+
+                        galleryLauncher.launch(
+                            PickVisualMediaRequest(
+                                ActivityResultContracts.PickVisualMedia.ImageOnly
+                            )
+                        )
+                    },
+                    onCameraClick = {
+                        showImageSourceSheet = false
+
+                        val uri = createImageUri(context)
+                        cameraUri = uri
+                        cameraLauncher.launch(uri)
+                    },
+                    onDismiss = {
+                        showImageSourceSheet = false
+                    },
+                )
             }
         }
     ) { paddingValues ->
@@ -156,17 +212,13 @@ fun AddBookScreen(
                             .clip(RoundedCornerShape(4.dp))
                             .background(colors.accent)
                             .clickable {
-                                imagePickerLauncher.launch(
-                                    PickVisualMediaRequest(
-                                        ActivityResultContracts.PickVisualMedia.ImageOnly
-                                    )
-                                )
+                                showImageSourceSheet = true
                             },
                         contentAlignment = Alignment.Center,
                     ) {
-                        if (state.bookItem.coverUri != null) {
+                        if (!state.bookItem.selectedCoverUri.isNullOrBlank()) {
                             AsyncImage(
-                                model = state.bookItem.coverUri,
+                                model = state.bookItem.selectedCoverUri,
                                 contentDescription = "Book cover",
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop,
@@ -262,5 +314,57 @@ fun AddBookScreen(
                 )
             }
         }
+
+        if (state.isSaving) {
+            AppCircularLoadingIndicator(transparentBackground = true)
+        }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ImageSourceBottomSheet(
+    onGalleryClick: () -> Unit,
+    onCameraClick: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        scrimColor = Color.Black.copy(alpha = 0.32f),
+        tonalElevation = 0.dp,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
+        ) {
+            Text(
+                text = "Add book cover",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+
+            ListItem(
+                onClick = onGalleryClick,
+                leadingContent = {
+                    Icon(Icons.Outlined.PhotoLibrary, contentDescription = null)
+                },
+                supportingContent = { Text("Select an existing image") },
+                content = { Text("Choose from gallery") },
+            )
+
+            ListItem(
+                onClick = onCameraClick,
+                leadingContent = {
+                    Icon(Icons.Outlined.CameraAlt, contentDescription = null)
+                },
+                supportingContent = { Text("Use your camera") },
+                content = { Text("Take a photo") },
+            )
+        }
+    }
+
 }

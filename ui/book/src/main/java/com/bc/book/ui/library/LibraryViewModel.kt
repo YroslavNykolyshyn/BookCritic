@@ -44,7 +44,8 @@ class LibraryViewModel @Inject constructor(
 
     private fun observeBooks() {
         viewModelScope.launch {
-            bookRepository.observeBooks().collect { books ->
+            bookRepository.observeBooks()
+                .collect { books ->
                 _uiState.update { state ->
                     state.copy(
                         books = books.map { book ->
@@ -57,7 +58,8 @@ class LibraryViewModel @Inject constructor(
                                 bookSummary = book.summary ?: "",
                                 bookOptionalSummary = book.note ?: "",
                             )
-                        }
+                        },
+                        isLoading = false
                     )
                 }
             }

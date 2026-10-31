@@ -24,9 +24,10 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 
 @Composable
 fun AppTopBar(
+    modifier: Modifier = Modifier,
     title: String,
     onAction: () -> Unit,
-    modifier: Modifier = Modifier,
+    enabled: Boolean,
 ) {
     Row(
         modifier = modifier
@@ -46,6 +47,7 @@ fun AppTopBar(
                     color = Color(0xFFE8DED2),
                     shape = CircleShape,
                 ),
+            enabled = enabled,
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.ArrowBack,

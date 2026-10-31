@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MenuBook
+import com.bc.core.widgets.AppCircularLoadingIndicator
 
 
 @Composable
@@ -34,62 +35,24 @@ fun HomeScreen(
         },
     ) { innerPadding ->
         when {
-            uiState.isLoading && uiState.books.isEmpty() -> {
+            uiState.isLoading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    AppCircularLoadingIndicator()
                 }
             }
 
             uiState.books.isEmpty() -> {
-                EmptyBooksContent(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                )
+
             }
 
             else -> {
 
             }
         }
-    }
-}
-
-@Composable
-private fun EmptyBooksContent(
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Icon(
-            imageVector = Icons.Default.MenuBook,
-            contentDescription = null,
-            modifier = Modifier.size(72.dp),
-            tint = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        Text(
-            text = "Your library is empty",
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        Text(
-            text = "Add your first book and start tracking your reading journey.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
     }
 }

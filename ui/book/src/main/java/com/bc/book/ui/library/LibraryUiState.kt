@@ -3,6 +3,7 @@ package com.bc.book.ui.library
 data class LibraryUiState(
     val searchQuery: String = "",
     val books: List<LibraryBookUiModel> = emptyList(),
+    val isLoading: Boolean = true,
 )
 
 data class LibraryBookUiModel(

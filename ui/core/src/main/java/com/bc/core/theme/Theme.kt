@@ -23,6 +23,12 @@ private fun AppColors.toColorScheme() = lightColorScheme(
     onSurfaceVariant = textPrimary,
 
     outline = outline,
+    outlineVariant = border,
+
+    surfaceTint = primary,
+    inverseSurface = textPrimary,
+    inverseOnSurface = background,
+    inversePrimary = accent,
 )
 
 object AppTheme {

@@ -7,7 +7,7 @@ import com.bc.model.repository.ReadingStatus
 sealed interface AddBookUIAction {
     data object BackClicked : AddBookUIAction
 
-    data class CoverSelected(val uri: Uri?) : AddBookUIAction
+    data class CoverSelected(val uri: Uri) : AddBookUIAction
     data object SaveClicked : AddBookUIAction
 
     data class TitleChanged(val value: String) : AddBookUIAction
