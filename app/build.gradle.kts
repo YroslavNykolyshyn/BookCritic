@@ -39,7 +39,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":ui:book"))
+    implementation(project(":ui:library"))
+    implementation(project(":ui:home"))
     implementation(project(":ui:core"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

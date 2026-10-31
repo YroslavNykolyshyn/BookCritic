@@ -16,5 +16,5 @@ data object Stats : NavKey
 data object AddLibraryBook: NavKey
 
 @Serializable
-data class BookDetails(val id: String) : NavKey
+data class EditLibraryBook(val id: String) : NavKey
 
