@@ -11,7 +11,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -91,7 +90,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
             }
 
             EditLibraryBookUIAction.OnSaveClicked -> {
-                viewModelScope.launch(Dispatchers.Main.immediate) {
+                viewModelScope.launch {
                     saveBook(_uiState.value)
                 }
             }
@@ -132,41 +131,45 @@ class EditLibraryBookViewModel @AssistedInject constructor(
         }
     }
 
-    private fun saveBook(editValue: EditLibraryBookUIState) {
+    private suspend fun saveBook(editValue: EditLibraryBookUIState) {
         if (!hasChanges()) {
             navigation.goBack()
             return
         }
-        if (_uiState.value.isLoading) return
-        _uiState.update { it.copy(isLoading = true) }
-        val bookItem = BookData(
-            id = bookId,
-            title = editValue.bookItem.title,
-            author = editValue.bookItem.author,
-            rating = editValue.bookItem.rating,
-            startedDate = editValue.bookItem.startedDate,
-            finishedDate = editValue.bookItem.finishedDate,
-            summary = editValue.bookItem.summary,
-            note = editValue.bookItem.note,
-            coverPath = editValue.bookItem.bookCover,
-            bookCost = editValue.bookItem.bookCost.trim().toLongOrNull(),
-        )
 
-        val selectedCoverUri = editValue.bookItem.selectedCoverUri
-            ?.let(Uri::parse)
+        if (_uiState.value.isLoading) return
+
+        _uiState.update { it.copy(isLoading = true) }
+
         try {
-            viewModelScope.launch {
-                repository.saveBook(
-                    book = bookItem,
-                    selectedCoverUri = selectedCoverUri,
-                )
-            }
+            val item = editValue.bookItem
+
+            val bookItem = BookData(
+                id = bookId,
+                title = item.title,
+                author = item.author,
+                rating = item.rating,
+                startedDate = item.startedDate,
+                finishedDate = item.finishedDate,
+                summary = item.summary,
+                note = item.note,
+                coverPath = item.bookCover,
+                bookCost = item.bookCost.trim().toLongOrNull(),
+            )
+
+            val selectedCoverUri = item.selectedCoverUri?.let(Uri::parse)
+
+            repository.saveBook(
+                book = bookItem,
+                selectedCoverUri = selectedCoverUri,
+            )
+
             navigation.goBack()
+
         } catch (e: Exception) {
             Log.e(TAG, "Failed to save book", e)
         } finally {
             _uiState.update { it.copy(isLoading = false) }
-            Log.d(TAG, "saveBook finished")
         }
     }
 
