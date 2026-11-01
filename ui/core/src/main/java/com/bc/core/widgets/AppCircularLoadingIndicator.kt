@@ -14,11 +14,11 @@ import com.bc.core.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun AppCircularLoadingIndicator(transparentBackground: Boolean = false) {
+fun AppCircularLoadingIndicator() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(if (transparentBackground) Color.Transparent else AppTheme.colors.background),
+            .background(Color.Transparent),
         contentAlignment = Alignment.Center,
     ) {
         LoadingIndicator(

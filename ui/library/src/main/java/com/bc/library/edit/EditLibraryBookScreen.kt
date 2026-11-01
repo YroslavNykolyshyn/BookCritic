@@ -77,7 +77,7 @@ fun EditLibraryBookScreen(
         bottomBar = {
             AppBottomBarButton(
                 visible = isKeyBoardVisible,
-                onSaveClicked = {onAction(EditLibraryBookUIAction.OnSaveClicked)},
+                onSaveClicked = { onAction(EditLibraryBookUIAction.OnSaveClicked) },
                 buttonEnabled = state.isLoading,
             )
 
@@ -105,30 +105,30 @@ fun EditLibraryBookScreen(
             )
         }
     ) { paddingValues ->
-        BookContentLayout(
-            paddingValues = paddingValues,
-            title = state.bookItem.title,
-            author = state.bookItem.author,
-            rating = state.bookItem.rating,
-            startedDate = state.bookItem.startedDate,
-            finishedDate = state.bookItem.finishedDate,
-            summary = state.bookItem.summary,
-            note = state.bookItem.note,
-            onTitleChanged = { onAction(EditLibraryBookUIAction.OnTitleChanged(it)) },
-            onAuthorChanged = { onAction(EditLibraryBookUIAction.OnAuthorChanged(it)) },
-            onRatingChanged = { onAction(EditLibraryBookUIAction.OnRatingChanged(it)) },
-            onStartedDateChanged = { onAction(EditLibraryBookUIAction.OnStartedDateChanged(it)) },
-            onFinishedDateChanged = { onAction(EditLibraryBookUIAction.OnFinishedDateChanged(it)) },
-            onSummaryChanged = { onAction(EditLibraryBookUIAction.OnSummaryChanged(it)) },
-            onNoteChanged = { onAction(EditLibraryBookUIAction.OnNoteChanged(it)) },
-            onCoverChange = {
-                showImageSourceSheet = true
-            },
-            selectedCoverUri = state.bookItem.selectedCoverUri,
-        )
-
         if (state.isLoading) {
-            AppCircularLoadingIndicator(transparentBackground = true)
+            AppCircularLoadingIndicator()
+        } else {
+            BookContentLayout(
+                paddingValues = paddingValues,
+                title = state.bookItem.title,
+                author = state.bookItem.author,
+                rating = state.bookItem.rating,
+                startedDate = state.bookItem.startedDate,
+                finishedDate = state.bookItem.finishedDate,
+                summary = state.bookItem.summary,
+                note = state.bookItem.note,
+                onTitleChanged = { onAction(EditLibraryBookUIAction.OnTitleChanged(it)) },
+                onAuthorChanged = { onAction(EditLibraryBookUIAction.OnAuthorChanged(it)) },
+                onRatingChanged = { onAction(EditLibraryBookUIAction.OnRatingChanged(it)) },
+                onStartedDateChanged = { onAction(EditLibraryBookUIAction.OnStartedDateChanged(it)) },
+                onFinishedDateChanged = { onAction(EditLibraryBookUIAction.OnFinishedDateChanged(it)) },
+                onSummaryChanged = { onAction(EditLibraryBookUIAction.OnSummaryChanged(it)) },
+                onNoteChanged = { onAction(EditLibraryBookUIAction.OnNoteChanged(it)) },
+                onCoverChange = {
+                    showImageSourceSheet = true
+                },
+                selectedCoverUri = state.bookItem.selectedCoverUri,
+            )
         }
     }
 }
