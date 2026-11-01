@@ -15,4 +15,5 @@ data class EditLibraryBookItem(
     val note: String = "",
     val selectedCoverUri: String? = null,
     val bookCost: String = "",
+    val bookCover: String? = null,
 )

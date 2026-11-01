@@ -42,7 +42,7 @@ class AddBookViewModel @Inject constructor(
             }
 
             AddBookUIAction.SaveClicked -> {
-                viewModelScope.launch(Dispatchers.Main.immediate) {
+                viewModelScope.launch {
                     saveBook()
                 }
             }
@@ -118,9 +118,7 @@ class AddBookViewModel @Inject constructor(
                     selectedCoverUri = selectedCoverUri,
                 )
             }
-
             navigation.goBack()
-
         } catch (e: Exception) {
             Log.e(TAG, "Failed to save book", e)
         } finally {
