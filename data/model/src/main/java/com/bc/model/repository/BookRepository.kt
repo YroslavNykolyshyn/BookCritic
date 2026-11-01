@@ -22,7 +22,7 @@ class BookRepository @Inject constructor(
         return dao.observeBookCount()
     }
 
-    override suspend fun getBook(id: String): BookData? =
+    override suspend fun getBookById(id: String): BookData? =
         dao.getBookById(id)?.toDomain()
 
     override suspend fun saveBook(

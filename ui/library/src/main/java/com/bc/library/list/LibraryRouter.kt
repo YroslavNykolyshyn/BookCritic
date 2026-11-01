@@ -1,4 +1,4 @@
-package com.bc.library
+package com.bc.library.list
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue

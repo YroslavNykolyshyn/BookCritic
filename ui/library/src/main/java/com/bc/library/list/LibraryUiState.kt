@@ -1,4 +1,4 @@
-package com.bc.library
+package com.bc.library.list
 
 data class LibraryUiState(
     val searchQuery: String = "",
