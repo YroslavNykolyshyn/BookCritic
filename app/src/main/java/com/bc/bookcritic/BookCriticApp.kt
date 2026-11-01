@@ -1,6 +1,7 @@
 package com.bc.bookcritic
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -29,7 +30,7 @@ fun BookCriticApp(
     )
 
     Scaffold(
-        bottomBar = {
+        floatingActionButton = {
             if (showBottomBar) {
                 BottomBarNavigation(
                     selectedDestination = currentKey,
@@ -37,6 +38,7 @@ fun BookCriticApp(
                 )
             }
         },
+        floatingActionButtonPosition = FabPosition.Center,
     ) { innerPadding ->
         NavDisplay(
             backStack = navigation.mainBackStack,
