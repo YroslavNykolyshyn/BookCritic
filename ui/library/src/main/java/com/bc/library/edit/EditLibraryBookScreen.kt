@@ -127,7 +127,8 @@ fun EditLibraryBookScreen(
                 onCoverChange = {
                     showImageSourceSheet = true
                 },
-                selectedCoverUri = state.bookItem.selectedCoverUri,
+                selectedCoverUri = state.bookItem.selectedCoverUri
+                    ?: state.bookItem.bookCover,
             )
         }
     }

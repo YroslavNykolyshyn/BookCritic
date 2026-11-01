@@ -29,16 +29,30 @@ class BookRepository @Inject constructor(
         book: BookData,
         selectedCoverUri: Uri?,
     ) {
+        val oldCoverPath = book.coverPath
+
         val savedCoverPath = selectedCoverUri?.let {
             coverStorage.save(it)
         }
 
         try {
             val bookToSave = book.copy(
-                coverPath = savedCoverPath,
+                coverPath = savedCoverPath ?: oldCoverPath,
             )
 
             dao.insertBook(bookToSave.toEntity())
+
+            if (savedCoverPath != null && oldCoverPath != null) {
+                runCatching {
+                    coverStorage.delete(oldCoverPath)
+                }.onFailure { cleanupError ->
+                    Log.e(
+                        TAG,
+                        "Failed to delete old book cover",
+                        cleanupError,
+                    )
+                }
+            }
         } catch (e: Exception) {
             savedCoverPath?.let { path ->
                 runCatching {
@@ -46,7 +60,7 @@ class BookRepository @Inject constructor(
                 }.onFailure { cleanupError ->
                     Log.e(
                         TAG,
-                        "Failed to clean up cover after book save failure",
+                        "Failed to clean up new cover after save failure",
                         cleanupError,
                     )
                 }

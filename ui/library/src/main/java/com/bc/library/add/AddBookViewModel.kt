@@ -8,13 +8,11 @@ import com.bc.core.navigation.INavigation
 import com.bc.model.repository.BookData
 import com.bc.model.repository.IBookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
@@ -42,9 +40,7 @@ class AddBookViewModel @Inject constructor(
             }
 
             AddBookUIAction.SaveClicked -> {
-                viewModelScope.launch(Dispatchers.Main.immediate) {
                     saveBook()
-                }
             }
 
             is AddBookUIAction.TitleChanged -> updateBookItem {
@@ -81,7 +77,7 @@ class AddBookViewModel @Inject constructor(
         }
     }
 
-    private suspend fun saveBook() {
+    private fun saveBook() {
         val state = _uiState.value
 
         if (state.isSaving) return
@@ -112,15 +108,13 @@ class AddBookViewModel @Inject constructor(
             val selectedCoverUri = item.selectedCoverUri
                 ?.let(Uri::parse)
 
-            withContext(Dispatchers.IO) {
+            viewModelScope.launch {
                 bookRepository.saveBook(
                     book = book,
                     selectedCoverUri = selectedCoverUri,
                 )
             }
-
             navigation.goBack()
-
         } catch (e: Exception) {
             Log.e(TAG, "Failed to save book", e)
         } finally {

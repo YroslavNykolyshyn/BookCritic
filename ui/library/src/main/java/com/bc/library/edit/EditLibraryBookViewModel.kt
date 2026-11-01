@@ -1,9 +1,11 @@
 package com.bc.library.edit
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bc.core.navigation.INavigation
+import com.bc.model.repository.BookData
 import com.bc.model.repository.IBookRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -24,6 +26,8 @@ class EditLibraryBookViewModel @AssistedInject constructor(
     private val _uiState = MutableStateFlow(EditLibraryBookUIState())
     val uiState: StateFlow<EditLibraryBookUIState> = _uiState.asStateFlow()
 
+    private var originalBook: BookData? = null
+
     @AssistedFactory
     interface Factory {
         fun create(bookId: String): EditLibraryBookViewModel
@@ -41,6 +45,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
 
             try {
                 val book = repository.getBookById(bookId)
+                originalBook = book
 
                 _uiState.update { currentState ->
                     if (book == null) {
@@ -57,13 +62,15 @@ class EditLibraryBookViewModel @AssistedInject constructor(
                                 finishedDate = book.finishedDate,
                                 summary = book.summary ?: "",
                                 note = book.note ?: "",
-                                selectedCoverUri = book.coverPath,
+                                bookCover = book.coverPath,
+                                selectedCoverUri = null,
                             ),
                             isLoading = false,
                         )
                     }
                 }
             } catch (exception: Exception) {
+                Log.d(TAG, "Load Data Error: ${exception.message}")
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -85,7 +92,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
 
             EditLibraryBookUIAction.OnSaveClicked -> {
                 viewModelScope.launch(Dispatchers.Main.immediate) {
-                    saveBook()
+                    saveBook(_uiState.value)
                 }
             }
 
@@ -120,11 +127,63 @@ class EditLibraryBookViewModel @AssistedInject constructor(
     }
 
     private fun onCoverSelected(uri: Uri) {
-        //TODO()
+        updateBookItem {
+            copy(selectedCoverUri = uri.toString())
+        }
     }
 
-    private fun saveBook() {
-        //TODO()
+    private fun saveBook(editValue: EditLibraryBookUIState) {
+        if (!hasChanges()) {
+            navigation.goBack()
+            return
+        }
+        if (_uiState.value.isLoading) return
+        _uiState.update { it.copy(isLoading = true) }
+        val bookItem = BookData(
+            id = bookId,
+            title = editValue.bookItem.title,
+            author = editValue.bookItem.author,
+            rating = editValue.bookItem.rating,
+            startedDate = editValue.bookItem.startedDate,
+            finishedDate = editValue.bookItem.finishedDate,
+            summary = editValue.bookItem.summary,
+            note = editValue.bookItem.note,
+            coverPath = editValue.bookItem.bookCover,
+            bookCost = editValue.bookItem.bookCost.trim().toLongOrNull(),
+        )
+
+        val selectedCoverUri = editValue.bookItem.selectedCoverUri
+            ?.let(Uri::parse)
+        try {
+            viewModelScope.launch {
+                repository.saveBook(
+                    book = bookItem,
+                    selectedCoverUri = selectedCoverUri,
+                )
+            }
+            navigation.goBack()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to save book", e)
+        } finally {
+            _uiState.update { it.copy(isLoading = false) }
+            Log.d(TAG, "saveBook finished")
+        }
+    }
+
+    private fun hasChanges(): Boolean {
+        val original = originalBook ?: return false
+        val current = _uiState.value.bookItem
+
+        return current.title != original.title ||
+                current.author != original.author ||
+                current.rating != (original.rating ?: 0f) ||
+                current.startedDate != original.startedDate ||
+                current.finishedDate != original.finishedDate ||
+                current.summary != (original.summary ?: "") ||
+                current.note != (original.note ?: "") ||
+                current.bookCover != original.coverPath ||
+                current.selectedCoverUri != null ||
+                current.bookCost.trim().toLongOrNull() != original.bookCost
     }
 
     private fun updateBookItem(
@@ -135,5 +194,8 @@ class EditLibraryBookViewModel @AssistedInject constructor(
                 bookItem = state.bookItem.update(),
             )
         }
+    }
+    companion object {
+        private const val TAG = "EditLibraryBookViewModel"
     }
 }
