@@ -1,6 +1,6 @@
 package com.bc.library.di
 
-import com.bc.library.LibraryRouter
+import com.bc.library.list.LibraryRouter
 import com.bc.library.add.AddBookRouter
 import com.bc.library.edit.EditLibraryBookRouter
 import com.bc.core.navigation.AddLibraryBook
@@ -26,7 +26,7 @@ class LibraryUIModule {
             AddBookRouter()
         }
         entry<EditLibraryBook> { data ->
-            EditLibraryBookRouter(data)
+            EditLibraryBookRouter(data = data)
         }
     }
 }

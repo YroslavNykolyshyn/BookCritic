@@ -1,4 +1,4 @@
-package com.bc.library
+package com.bc.library.list
 
 sealed interface LibraryUIAction {
     data class OnSearchChanged(val query: String) : LibraryUIAction

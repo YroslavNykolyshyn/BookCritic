@@ -1,0 +1,191 @@
+package com.bc.library
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddPhotoAlternate
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import com.bc.core.theme.AppTheme
+import com.bc.core.theme.AppTheme.colors
+import com.bc.core.widgets.AppDataPickerField
+import com.bc.core.widgets.AppStarRatingBar
+import com.bc.core.widgets.AppTextInput
+
+@Composable
+fun BookContentLayout(
+    title: String,
+    author: String,
+    rating: Float,
+    startedDate: Long?,
+    finishedDate: Long?,
+    summary: String,
+    note: String,
+    onTitleChanged: (String) -> Unit,
+    onAuthorChanged: (String) -> Unit,
+    onRatingChanged: (Float) -> Unit,
+    onStartedDateChanged: (Long?) -> Unit,
+    onFinishedDateChanged: (Long?) -> Unit,
+    onSummaryChanged: (String) -> Unit,
+    onNoteChanged: (String) -> Unit,
+    onCoverChange: () -> Unit,
+    paddingValues: PaddingValues,
+    selectedCoverUri: String?,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+    ) {
+        HorizontalDivider(color = colors.border)
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(
+                    horizontal = AppTheme.dimensions.paddingBig,
+                    vertical = AppTheme.dimensions.paddingExtraMedium,
+                ),
+            verticalArrangement = Arrangement.spacedBy(
+                AppTheme.dimensions.paddingBig,
+            ),
+        ) {
+            // Cover
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(22.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(width = 100.dp, height = 136.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(colors.accent)
+                        .clickable {
+                            onCoverChange()
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (!selectedCoverUri.isNullOrBlank()) {
+                        AsyncImage(
+                            model = selectedCoverUri,
+                            contentDescription = "Book cover",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Outlined.AddPhotoAlternate,
+                            contentDescription = stringResource(R.string.add_book_cover),
+                            tint = colors.primary,
+                            modifier = Modifier.size(AppTheme.dimensions.iconSizeTiny),
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.book_cover_headline),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = colors.textPrimary,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+
+                    Text(
+                        text = stringResource(R.string.book_cover_description_upload),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.secondary,
+                    )
+                }
+            }
+
+            // Title
+            AppTextInput(
+                label = stringResource(R.string.book_title_label),
+                value = title,
+                placeholder = stringResource(R.string.book_title_placeholder),
+                onAction = {
+                    onTitleChanged(it)
+                },
+            )
+
+            // Author
+            AppTextInput(
+                label = stringResource(R.string.book_author_label),
+                value = author,
+                placeholder = stringResource(R.string.book_author_placeholder),
+                onAction = {
+                    onAuthorChanged(it)
+                },
+            )
+
+            // Personal Rating
+            AppStarRatingBar(
+                label = stringResource(R.string.book_rating_label),
+                rating = rating,
+                onRatingChanged = { onRatingChanged(it) }
+            )
+
+            // Reading dates
+            AppDataPickerField(
+                startDate = startedDate,
+                endDate = finishedDate,
+                onStartDateChange = { onStartedDateChanged(it) },
+                onEndDateChange = { onFinishedDateChanged(it) }
+            )
+
+            // Summary
+            AppTextInput(
+                label = "Summary",
+                value = summary,
+                placeholder = "What did you think about this book?",
+                singleLine = false,
+                minLines = 3,
+                height = 114.dp,
+                onAction = {
+                   onSummaryChanged(it)
+                },
+            )
+
+            // Private note
+            AppTextInput(
+                label = "A note for later · optional",
+                value = note,
+                placeholder = "A thought to revisit later...",
+                singleLine = false,
+                minLines = 2,
+                height = 82.dp,
+                onAction = {
+                   onNoteChanged(it)
+                },
+            )
+        }
+    }
+}

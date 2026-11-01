@@ -2,6 +2,7 @@
 <resources>
     <!-- Add Book screen -->
     <string name="add_book_title">Add book</string>
+    <string name="edit_book_title">Edit book</string>
 
     <!-- Book cover -->
     <string name="book_cover_description">Book cover</string>

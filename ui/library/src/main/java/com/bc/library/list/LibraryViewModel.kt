@@ -1,4 +1,4 @@
-package com.bc.library
+package com.bc.library.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
