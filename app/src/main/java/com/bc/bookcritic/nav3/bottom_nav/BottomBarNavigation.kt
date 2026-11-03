@@ -63,6 +63,7 @@ private fun FloatingNavigationItem(
 ) {
     Surface(
         onClick = onClick,
+        selected = selected,
         shape = CircleShape,
         color = if (selected) colors.surfaceVariant else Color.Transparent,
     ) {

@@ -15,6 +15,7 @@ class Navigation @Inject constructor() : INavigation {
     override val mainBackStack: SnapshotStateList<NavKey> = mutableStateListOf(Home)
 
     override fun goTo(destination: NavKey) {
+        if (mainBackStack.lastOrNull() == destination) return
         mainBackStack.add(destination)
     }
 
