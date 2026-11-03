@@ -5,6 +5,7 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -42,7 +43,9 @@ fun BookCriticApp(
     ) { innerPadding ->
         NavDisplay(
             backStack = navigation.mainBackStack,
-            onBack = navigation::goBack,
+            onBack = dropUnlessResumed {
+                navigation.goBack()
+            },
             modifier = Modifier.padding(innerPadding),
             entryDecorators = listOf(
                 rememberSaveableStateHolderNavEntryDecorator(),
