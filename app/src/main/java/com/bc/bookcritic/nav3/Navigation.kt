@@ -1,6 +1,8 @@
 package com.bc.bookcritic.nav3
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.navigation3.runtime.NavKey
 import com.bc.core.navigation.Home
 import com.bc.core.navigation.INavigation
@@ -10,8 +12,7 @@ import javax.inject.Inject
 @ActivityRetainedScoped
 class Navigation @Inject constructor() : INavigation {
 
-    override val mainBackStack: List<NavKey>
-        field = mutableStateListOf<NavKey>(Home)
+    override val mainBackStack: SnapshotStateList<NavKey> = mutableStateListOf(Home)
 
     override fun goTo(destination: NavKey) {
         if (mainBackStack.lastOrNull() == destination) return
@@ -19,8 +20,9 @@ class Navigation @Inject constructor() : INavigation {
     }
 
     override fun goBack() {
-        if (mainBackStack.size > 1) {
-            mainBackStack.removeLastOrNull()
+        when (mainBackStack.size) {
+            1 -> Log.d("Navigation", "Go back rejected!")
+            else -> mainBackStack.removeLastOrNull()
         }
     }
 }

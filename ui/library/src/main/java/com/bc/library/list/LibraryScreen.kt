@@ -1,14 +1,19 @@
 package com.bc.library.list
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,10 +22,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +34,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Image
@@ -36,10 +42,10 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.Tune
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
@@ -55,6 +61,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -82,12 +89,7 @@ fun LibraryScreen(
         containerColor = colors.background,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
-            LibrarySearchBar(
-                modifier = Modifier
-                    .padding(
-                        horizontal = AppTheme.dimensions.paddingTiny,
-                        vertical = AppTheme.dimensions.paddingExtraSmall
-                    ),
+            LibraryToolbar(
                 query = state.searchQuery,
                 onQueryChange = {
                     onAction(LibraryUIAction.OnSearchChanged(it))
@@ -95,21 +97,16 @@ fun LibraryScreen(
                 onFilterClick = {
                     onAction(LibraryUIAction.OnFilterClicked)
                 },
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
+                onAddBookClick = {
                     onAction(LibraryUIAction.OnAddBookClicked)
                 },
-                containerColor = colors.primary,
-                contentColor = colors.onPrimary,
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Add,
-                    contentDescription = "Add book",
-                )
-            }
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = AppTheme.dimensions.paddingSmall,
+                        vertical = AppTheme.dimensions.paddingExtraSmall,
+                    ),
+            )
         },
     ) { innerPadding ->
         when {
@@ -189,62 +186,6 @@ fun LibraryScreen(
 
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun LibrarySearchBar(
-    query: String,
-    onQueryChange: (String) -> Unit,
-    onFilterClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 56.dp)
-            .clip(RoundedCornerShape(24.dp))
-            .background(colors.surfaceVariant)
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            imageVector = Icons.Outlined.Search,
-            contentDescription = null,
-            tint = colors.primary,
-        )
-
-        BasicTextField(
-            value = query,
-            onValueChange = onQueryChange,
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 12.dp),
-            singleLine = true,
-            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                color = colors.textPrimary,
-            ),
-            decorationBox = { innerTextField ->
-                Box {
-                    if (query.isEmpty()) {
-                        Text(
-                            text = "Search books, authors...",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = colors.textHint,
-                        )
-                    }
-                    innerTextField()
-                }
-            },
-        )
-
-        IconButton(onClick = onFilterClick) {
-            Icon(
-                imageVector = Icons.Outlined.Tune,
-                contentDescription = "Filter books",
-                tint = colors.primary,
-            )
         }
     }
 }
@@ -401,6 +342,120 @@ private fun EmptyBooksContent(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun LibraryToolbar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onFilterClick: () -> Unit,
+    onAddBookClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val shape = RoundedCornerShape(24.dp)
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 56.dp)
+            .background(
+                color = colors.bottomBarBackground,
+                shape = shape,
+            )
+            .border(
+                width = 1.dp,
+                color = colors.border,
+                shape = shape,
+            )
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Search,
+            contentDescription = null,
+            tint = colors.secondary,
+        )
+
+        BasicTextField(
+            value = query,
+            onValueChange = onQueryChange,
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 12.dp),
+            singleLine = true,
+            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                color = colors.textPrimary,
+            ),
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    if (query.isEmpty()) {
+                        Text(
+                            text = "Search books, authors...",
+                            color = colors.textHint,
+                            style = MaterialTheme.typography.bodyLarge,
+                            maxLines = 1,
+                        )
+                    }
+                    innerTextField()
+                }
+            },
+        )
+
+        AnimatedContent(
+            targetState = query.isNotBlank(),
+            transitionSpec = {
+                fadeIn() + expandHorizontally() togetherWith
+                        fadeOut() + shrinkHorizontally()
+            },
+            label = "SearchActions",
+        ) { isSearching ->
+            if (isSearching) {
+                ToolbarActionButton(
+                    icon = Icons.Default.Close,
+                    description = "Clear search",
+                    onClick = { onQueryChange("") },
+                )
+            } else {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    ToolbarActionButton(
+                        icon = Icons.Outlined.Tune,
+                        description = "Filter books",
+                        onClick = onFilterClick,
+                    )
+
+                    ToolbarActionButton(
+                        icon = Icons.Outlined.Add,
+                        description = "Add book",
+                        onClick = onAddBookClick,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ToolbarActionButton(
+    icon: ImageVector,
+    description: String,
+    onClick: () -> Unit,
+) {
+    IconButton(
+        onClick = onClick,
+        colors = IconButtonDefaults.iconButtonColors(
+            contentColor = colors.primary,
+            containerColor = colors.surfaceVariant,
+        ),
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = description,
         )
     }
 }
