@@ -86,7 +86,7 @@ fun SwipeableBookItem(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(28.dp)),
+            .clip(RoundedCornerShape(16.dp)),
     ) {
         Box(
             modifier = Modifier.matchParentSize(),
