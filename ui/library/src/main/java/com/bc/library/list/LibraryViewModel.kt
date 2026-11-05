@@ -77,10 +77,7 @@ class LibraryViewModel @Inject constructor(
 
     private fun updateFavorite(bookId: String) {
         viewModelScope.launch {
-            val book = bookRepository.getBookById(bookId) ?: return@launch
-            bookRepository.updateBook(
-                book.copy(isFavorite = !book.isFavorite)
-            )
+            bookRepository.toggleFavorite(bookId)
         }
     }
 }

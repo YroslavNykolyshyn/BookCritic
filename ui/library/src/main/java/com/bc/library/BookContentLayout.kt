@@ -202,12 +202,11 @@ fun BookContentLayout(
             )
 
             // Personal Rating
-            if (isEditable || rating > 0f) {
+            if (isEditable) {
                 AppStarRatingBar(
                     label = stringResource(R.string.book_rating_label),
                     rating = rating,
                     onRatingChanged = { onRatingChanged(it) },
-                    enabled = isEditable,
                 )
             }
 

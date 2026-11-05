@@ -45,4 +45,11 @@ interface BookDao {
 
     @Query("SELECT COUNT(*) FROM book WHERE status = 'ALREADY_READ'")
     fun observeBookCount(): Flow<Int>
+
+    @Query("""
+    UPDATE book
+    SET favorite = NOT favorite
+    WHERE id = :bookId
+""")
+    suspend fun toggleFavorite(bookId: String): Int
 }

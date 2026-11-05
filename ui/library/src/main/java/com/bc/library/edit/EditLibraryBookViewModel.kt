@@ -162,6 +162,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
                 note = item.note,
                 coverPath = item.bookCover,
                 bookCost = item.bookCost.trim().toLongOrNull(),
+                isFavorite = item.isFavorite,
             )
 
             val selectedCoverUri = item.selectedCoverUri?.let(Uri::parse)

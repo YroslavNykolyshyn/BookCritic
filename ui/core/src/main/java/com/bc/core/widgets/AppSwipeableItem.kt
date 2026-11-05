@@ -19,7 +19,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,21 +49,11 @@ fun SwipeableBookItem(
         mutableFloatStateOf(0f)
     }
 
-    var isDragging by remember(bookId) {
-        mutableStateOf(false)
-    }
-
     val animatedOffset by animateDpAsState(
         targetValue = with(density) { dragOffset.toDp() },
         animationSpec = spring(),
         label = "bookSwipeOffset",
     )
-
-    val currentOffset = if (isDragging) {
-        with(density) { dragOffset.toDp() }
-    } else {
-        animatedOffset
-    }
 
     Box(
         modifier = modifier
@@ -94,7 +83,10 @@ fun SwipeableBookItem(
                         .align(Alignment.CenterStart)
                         .width(actionWidth)
                         .fillMaxHeight(),
-                    onClick = onPinClick,
+                    onClick = {
+                        onPinClick()
+                        dragOffset = 0f
+                    },
                 )
             }
         }
@@ -105,23 +97,19 @@ fun SwipeableBookItem(
                 .zIndex(1f)
                 .offset {
                     IntOffset(
-                        x = with(density) { currentOffset.roundToPx() },
+                        x = animatedOffset.roundToPx(),
                         y = 0,
                     )
                 }
                 .pointerInput(bookId, actionWidthPx) {
                     detectHorizontalDragGestures(
                         onHorizontalDrag = { change, dragAmount ->
-                            isDragging = true
-
                             dragOffset = (dragOffset + dragAmount)
                                 .coerceIn(0f, actionWidthPx)
 
                             change.consume()
                         },
                         onDragEnd = {
-                            isDragging = false
-
                             dragOffset = if (dragOffset > actionWidthPx / 2) {
                                 actionWidthPx
                             } else {
@@ -129,7 +117,6 @@ fun SwipeableBookItem(
                             }
                         },
                         onDragCancel = {
-                            isDragging = false
                             dragOffset = 0f
                         },
                     )
