@@ -27,6 +27,7 @@ fun AppDataPickerField(
     endDate: Long?,
     onStartDateChange: (Long?) -> Unit,
     onEndDateChange: (Long?) -> Unit,
+    enabled: Boolean = true,
 ) {
     var showStartedDatePicker by remember { mutableStateOf(false) }
     var showFinishedDatePicker by remember { mutableStateOf(false) }
@@ -49,6 +50,7 @@ fun AppDataPickerField(
                 valueColor = if (startDate == null) AppTheme.colors.textHint else AppTheme.colors.textPrimary,
                 onClick = { showStartedDatePicker = true },
                 modifier = Modifier.weight(1f),
+                enabled = enabled,
             )
 
             AppDateField(
@@ -56,6 +58,7 @@ fun AppDataPickerField(
                 valueColor = if (endDate == null) AppTheme.colors.textHint else AppTheme.colors.textPrimary,
                 onClick = { showFinishedDatePicker = true },
                 modifier = Modifier.weight(1f),
+                enabled = enabled,
             )
         }
     }

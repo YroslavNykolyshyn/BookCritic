@@ -6,6 +6,7 @@ sealed interface EditLibraryBookUIAction {
     data object BackClicked : EditLibraryBookUIAction
 
     data class OnCoverSelected(val uri: Uri) : EditLibraryBookUIAction
+    data object OnEditClicked : EditLibraryBookUIAction
     data object OnSaveClicked : EditLibraryBookUIAction
 
     data class OnTitleChanged(val value: String) : EditLibraryBookUIAction

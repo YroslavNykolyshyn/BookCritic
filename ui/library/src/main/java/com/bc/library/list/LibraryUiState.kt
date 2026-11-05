@@ -14,4 +14,5 @@ data class LibraryBookUiModel(
     val coverPath: String?,
     val bookSummary: String,
     val bookOptionalSummary: String,
+    val isFavorite: Boolean = false,
 )

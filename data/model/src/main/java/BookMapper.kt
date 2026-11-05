@@ -15,6 +15,7 @@ fun BookEntity.toDomain() = BookData(
     note = note,
     coverPath = coverPath,
     bookCost = bookCost,
+    isFavorite = favorite ?: false,
 )
 
 fun BookData.toEntity() = BookEntity(
@@ -29,4 +30,5 @@ fun BookData.toEntity() = BookEntity(
     note = note,
     coverPath = coverPath,
     bookCost = bookCost,
+    favorite = isFavorite,
 )

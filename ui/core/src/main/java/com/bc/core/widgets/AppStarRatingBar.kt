@@ -32,6 +32,7 @@ fun AppStarRatingBar(
     rating: Float,
     maxRating: Int = 5,
     onRatingChanged: (Float) -> Unit,
+    enabled: Boolean = true,
 ) {
     Column(
         modifier = modifier,
@@ -67,6 +68,7 @@ fun AppStarRatingBar(
 
                     IconButton(
                         onClick = { onRatingChanged(i.toFloat()) },
+                        enabled = enabled,
                     ) {
                         Icon(
                             modifier = Modifier.size(AppTheme.dimensions.iconSizeTiny),

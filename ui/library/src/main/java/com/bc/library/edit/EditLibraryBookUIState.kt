@@ -3,6 +3,7 @@ package com.bc.library.edit
 data class EditLibraryBookUIState(
     val isLoading: Boolean = false,
     val bookItem: EditLibraryBookItem = EditLibraryBookItem(),
+    val isEditing: Boolean = false,
 )
 
 data class EditLibraryBookItem(
@@ -16,4 +17,5 @@ data class EditLibraryBookItem(
     val selectedCoverUri: String? = null,
     val bookCost: String = "",
     val bookCover: String? = null,
+    val isFavorite: Boolean = false,
 )

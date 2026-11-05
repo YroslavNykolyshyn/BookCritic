@@ -40,8 +40,12 @@ class LibraryViewModel @Inject constructor(
                 // Update searchQuery in the ViewModel.
             }
 
-            is LibraryUIAction.OnEditBookClicked -> {
+            is LibraryUIAction.OnViewBookClicked -> {
                 navigation.goTo(EditLibraryBook(action.id))
+            }
+
+            is LibraryUIAction.OnFavoriteBookClicked -> {
+               updateFavorite(action.id)
             }
         }
     }
@@ -61,12 +65,22 @@ class LibraryViewModel @Inject constructor(
                                 coverPath = book.coverPath,
                                 bookSummary = book.summary ?: "",
                                 bookOptionalSummary = book.note ?: "",
+                                isFavorite = book.isFavorite,
                             )
                         },
                         isLoading = false
                     )
                 }
             }
+        }
+    }
+
+    private fun updateFavorite(bookId: String) {
+        viewModelScope.launch {
+            val book = bookRepository.getBookById(bookId) ?: return@launch
+            bookRepository.updateBook(
+                book.copy(isFavorite = !book.isFavorite)
+            )
         }
     }
 }

@@ -27,6 +27,7 @@ fun AppTextInput(
     minLines: Int = 1,
     singleLine: Boolean = true,
     height: Dp? = null,
+    readOnly: Boolean = false,
 ) {
     val fieldShape = RoundedCornerShape(17.dp)
 
@@ -72,6 +73,7 @@ fun AppTextInput(
                 cursorColor = Color(0xFF79543E),
             ),
             textStyle = MaterialTheme.typography.bodyLarge,
+            readOnly = readOnly,
         )
     }
 }
