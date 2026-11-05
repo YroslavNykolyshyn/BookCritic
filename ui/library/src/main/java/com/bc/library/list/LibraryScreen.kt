@@ -81,6 +81,9 @@ fun LibraryScreen(
                 onQueryChange = {
                     onAction(LibraryUIAction.OnSearchChanged(it))
                 },
+                onSearchStopped = {
+                    onAction(LibraryUIAction.OnSearchStopped)
+                },
                 onFilterClick = {
                     onAction(LibraryUIAction.OnFilterClicked)
                 },
@@ -282,6 +285,7 @@ private fun EmptyBooksContent(
 fun LibraryToolbar(
     query: String,
     onQueryChange: (String) -> Unit,
+    onSearchStopped: () -> Unit,
     onFilterClick: () -> Unit,
     onAddBookClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -349,7 +353,10 @@ fun LibraryToolbar(
                 ToolbarActionButton(
                     icon = Icons.Default.Close,
                     description = "Clear search",
-                    onClick = { onQueryChange("") },
+                    onClick = {
+                        onQueryChange("")
+                        onSearchStopped()
+                    },
                 )
             } else {
                 Row(

@@ -10,9 +10,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.map
 
 @HiltViewModel
 class LibraryViewModel @Inject constructor(
@@ -36,9 +40,10 @@ class LibraryViewModel @Inject constructor(
                 // Open your filter UI.
             }
 
-            is LibraryUIAction.OnSearchChanged -> {
-                // Update searchQuery in the ViewModel.
-            }
+            LibraryUIAction.OnSearchStopped -> onSearchStopped()
+
+            is LibraryUIAction.OnSearchChanged ->
+                onSearchChanged(action.query)
 
             is LibraryUIAction.OnViewBookClicked -> {
                 navigation.goTo(EditLibraryBook(action.id))
@@ -52,23 +57,17 @@ class LibraryViewModel @Inject constructor(
 
     private fun observeBooks() {
         viewModelScope.launch {
-            bookRepository.observeBooks()
-                .collect { books ->
-                _uiState.update { state ->
-                    state.copy(
-                        books = books.map { book ->
-                            LibraryBookUiModel(
-                                id = book.id,
-                                title = book.title,
-                                author = book.author,
-                                rating = book.rating,
-                                coverPath = book.coverPath,
-                                bookSummary = book.summary ?: "",
-                                bookOptionalSummary = book.note ?: "",
-                                isFavorite = book.isFavorite,
-                            )
-                        },
-                        isLoading = false
+            combine(
+                bookRepository.observeBooks(),
+                uiState.map { it.searchQuery }
+                    .distinctUntilChanged(),
+            ) { books, query ->
+                books.filterBooks(query).map { it.toUiModel() }
+            }.collect { books ->
+                _uiState.update {
+                    it.copy(
+                        books = books,
+                        isLoading = false,
                     )
                 }
             }
@@ -78,6 +77,20 @@ class LibraryViewModel @Inject constructor(
     private fun updateFavorite(bookId: String) {
         viewModelScope.launch {
             bookRepository.toggleFavorite(bookId)
+        }
+    }
+
+    private fun onSearchStopped() {
+        _uiState.update {
+            it.copy(
+                searchQuery = "",
+            )
+        }
+    }
+
+    private fun onSearchChanged(query: String) {
+        _uiState.update {
+            it.copy(searchQuery = query)
         }
     }
 }
