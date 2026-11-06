@@ -1,16 +1,13 @@
 package com.bc.library.list
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,14 +32,11 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.Tune
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -53,11 +47,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,6 +54,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -72,7 +62,6 @@ import com.bc.core.theme.AppTheme
 import com.bc.core.theme.AppTheme.colors
 import com.bc.core.theme.MaterialAppTheme
 import com.bc.core.widgets.AppCircularLoadingIndicator
-import com.bc.core.widgets.BookSwipeReveal
 import com.bc.core.widgets.SwipeableBookItem
 
 @Composable
@@ -81,9 +70,7 @@ fun LibraryScreen(
     onAction: (LibraryUIAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var activeSwipe by remember {
-        mutableStateOf<BookSwipeReveal?>(null)
-    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = colors.background,
@@ -93,6 +80,9 @@ fun LibraryScreen(
                 query = state.searchQuery,
                 onQueryChange = {
                     onAction(LibraryUIAction.OnSearchChanged(it))
+                },
+                onSearchStopped = {
+                    onAction(LibraryUIAction.OnSearchStopped)
                 },
                 onFilterClick = {
                     onAction(LibraryUIAction.OnFilterClicked)
@@ -128,8 +118,10 @@ fun LibraryScreen(
                         .fillMaxSize()
                         .padding(innerPadding),
                     contentPadding = PaddingValues(
-                        horizontal = AppTheme.dimensions.paddingBig,
-                        vertical = AppTheme.dimensions.paddingMedium,
+                        start = AppTheme.dimensions.paddingBig,
+                        end = AppTheme.dimensions.paddingBig,
+                        top = AppTheme.dimensions.paddingMedium,
+                        bottom = 56.dp + AppTheme.dimensions.paddingExtraLarge,
                     ),
                     verticalArrangement = Arrangement.spacedBy(
                         AppTheme.dimensions.paddingBig,
@@ -140,24 +132,10 @@ fun LibraryScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Text(
-                                text = "YOUR LITTLE ESCAPE",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = colors.primary,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-
-                            Text(
                                 text = "Already read",
                                 style = MaterialTheme.typography.displaySmall,
                                 color = colors.textPrimary,
                                 fontWeight = FontWeight.Bold,
-                            )
-
-                            Text(
-                                text = "A quiet record of the stories you've finished, " +
-                                        "with the covers and ratings that stayed with you.",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = colors.textSecondary,
                             )
                         }
                     }
@@ -167,17 +145,14 @@ fun LibraryScreen(
                         key = { it.id },
                     ) { book ->
                         SwipeableBookItem(
+                            isFavorite = book.isFavorite,
                             bookId = book.id,
-                            activeSwipe = activeSwipe,
-                            onRevealChange = { activeSwipe = it },
                             onPinClick = {
-                                // TODO: Handle pin action
-                            },
-                            onEditClick = {
-                                onAction(LibraryUIAction.OnEditBookClicked(book.id))
+                                onAction(LibraryUIAction.OnFavoriteBookClicked(book.id))
                             },
                         ) { cardModifier ->
                             LibraryBookItem(
+                                onClick = {onAction(LibraryUIAction.OnViewBookClicked(book.id))},
                                 book = book,
                                 modifier = cardModifier,
                             )
@@ -194,11 +169,8 @@ fun LibraryScreen(
 private fun LibraryBookItem(
     book: LibraryBookUiModel,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit,
 ) {
-    var expanded by rememberSaveable(book.id) {
-        mutableStateOf(false)
-    }
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -210,29 +182,33 @@ private fun LibraryBookItem(
                 ),
             )
             .clickable {
-                expanded = !expanded
+              onClick()
             }
-            .padding(20.dp),
-        horizontalArrangement = Arrangement.spacedBy(20.dp),
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BookCover(book = book)
 
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             Text(
                 text = book.title,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 color = colors.textPrimary,
                 fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Clip,
             )
 
             Text(
                 text = book.author,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 color = colors.textSecondary,
+                maxLines = 1,
+                overflow = TextOverflow.Clip,
             )
 
             Row(
@@ -243,7 +219,6 @@ private fun LibraryBookItem(
                     imageVector = Icons.Outlined.Star,
                     contentDescription = "Rating",
                     tint = colors.primary,
-                    modifier = Modifier.size(22.dp),
                 )
 
                 Text(
@@ -253,47 +228,7 @@ private fun LibraryBookItem(
                     fontWeight = FontWeight.Bold,
                 )
             }
-
-            AnimatedVisibility(
-                visible = expanded,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically(),
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    HorizontalDivider(color = colors.border)
-
-                    Text(
-                        text = book.bookSummary,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = colors.textPrimary,
-                    )
-
-                    HorizontalDivider(color = colors.border)
-
-                    Text(
-                        text = book.bookOptionalSummary,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = colors.textPrimary,
-                    )
-                }
-            }
         }
-
-        Icon(
-            imageVector = if (expanded) {
-                Icons.Default.ExpandLess
-            } else {
-                Icons.Default.ExpandMore
-            },
-            contentDescription = if (expanded) {
-                "Collapse details"
-            } else {
-                "Expand details"
-            },
-            tint = colors.textSecondary,
-        )
     }
 }
 
@@ -306,7 +241,7 @@ private fun BookCover(
         model = book.coverPath?.takeIf { it.isNotBlank() },
         contentDescription = "${book.title} cover",
         modifier = modifier
-            .size(width = 100.dp, height = 136.dp)
+            .size(width = 76.dp, height = 104.dp)
             .clip(RoundedCornerShape(5.dp)),
         contentScale = ContentScale.Crop,
     )
@@ -350,6 +285,7 @@ private fun EmptyBooksContent(
 fun LibraryToolbar(
     query: String,
     onQueryChange: (String) -> Unit,
+    onSearchStopped: () -> Unit,
     onFilterClick: () -> Unit,
     onAddBookClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -417,7 +353,10 @@ fun LibraryToolbar(
                 ToolbarActionButton(
                     icon = Icons.Default.Close,
                     description = "Clear search",
-                    onClick = { onQueryChange("") },
+                    onClick = {
+                        onQueryChange("")
+                        onSearchStopped()
+                    },
                 )
             } else {
                 Row(

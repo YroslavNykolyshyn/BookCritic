@@ -63,6 +63,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
                                 note = book.note ?: "",
                                 bookCover = book.coverPath,
                                 selectedCoverUri = null,
+                                isFavorite = book.isFavorite,
                             ),
                             isLoading = false,
                         )
@@ -83,6 +84,12 @@ class EditLibraryBookViewModel @AssistedInject constructor(
         when (action) {
             EditLibraryBookUIAction.BackClicked -> {
                 navigation.goBack()
+            }
+
+            is EditLibraryBookUIAction.OnEditClicked -> {
+                _uiState.update {
+                    it.copy(isEditing = true)
+                }
             }
 
             is EditLibraryBookUIAction.OnCoverSelected -> {
@@ -155,6 +162,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
                 note = item.note,
                 coverPath = item.bookCover,
                 bookCost = item.bookCost.trim().toLongOrNull(),
+                isFavorite = item.isFavorite,
             )
 
             val selectedCoverUri = item.selectedCoverUri?.let(Uri::parse)

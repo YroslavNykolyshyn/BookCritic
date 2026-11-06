@@ -77,6 +77,14 @@ class BookRepository @Inject constructor(
         }
     }
 
+    override suspend fun updateBook(book: BookData) {
+        dao.updateBook(book.toEntity())
+    }
+
+    override suspend fun toggleFavorite(bookId: String) {
+        dao.toggleFavorite(bookId)
+    }
+
     companion object {
         private const val TAG = "BookRepository"
     }

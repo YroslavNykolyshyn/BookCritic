@@ -21,13 +21,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Edit
 
 @Composable
 fun AppTopBar(
     modifier: Modifier = Modifier,
     title: String,
     onAction: () -> Unit,
-    enabled: Boolean,
+    enabled: Boolean = true,
+    showEditAction: Boolean = false,
+    onEditClick: () -> Unit = {},
 ) {
     Row(
         modifier = modifier
@@ -58,9 +61,29 @@ fun AppTopBar(
 
         Text(
             text = title,
+            modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.titleLarge,
             color = Color(0xFF34291F),
             fontWeight = FontWeight.SemiBold,
         )
+
+        if (showEditAction) {
+            IconButton(
+                modifier = Modifier
+                    .border(
+                    width = 1.dp,
+                    color = Color(0xFFE8DED2),
+                    shape = CircleShape,
+                ),
+                onClick = onEditClick,
+                enabled = enabled,
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = "Edit book",
+                    tint = Color(0xFF73513D),
+                )
+            }
+        }
     }
 }

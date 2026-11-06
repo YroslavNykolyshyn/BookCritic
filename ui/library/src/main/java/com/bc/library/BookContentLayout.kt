@@ -15,7 +15,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.AddPhotoAlternate
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +40,7 @@ import com.bc.core.widgets.AppTextInput
 
 @Composable
 fun BookContentLayout(
+    isEditable: Boolean = true,
     title: String,
     author: String,
     rating: Float,
@@ -54,6 +58,7 @@ fun BookContentLayout(
     onCoverChange: () -> Unit,
     paddingValues: PaddingValues,
     selectedCoverUri: String?,
+    isPinned: Boolean = false,
 ) {
     Column(
         modifier = Modifier
@@ -85,9 +90,13 @@ fun BookContentLayout(
                         .size(width = 100.dp, height = 136.dp)
                         .clip(RoundedCornerShape(4.dp))
                         .background(colors.accent)
-                        .clickable {
-                            onCoverChange()
-                        },
+                        .then(
+                            if (isEditable) {
+                                Modifier.clickable(onClick = onCoverChange)
+                            } else {
+                                Modifier
+                            }
+                        ),
                     contentAlignment = Alignment.Center,
                 ) {
                     if (!selectedCoverUri.isNullOrBlank()) {
@@ -107,22 +116,66 @@ fun BookContentLayout(
                     }
                 }
 
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    Text(
-                        text = stringResource(R.string.book_cover_headline),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = colors.textPrimary,
-                        fontWeight = FontWeight.SemiBold,
-                    )
+                if (isEditable) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.book_cover_headline),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = colors.textPrimary,
+                            fontWeight = FontWeight.SemiBold,
+                        )
 
-                    Text(
-                        text = stringResource(R.string.book_cover_description_upload),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = colors.secondary,
-                    )
+                        Text(
+                            text = stringResource(R.string.book_cover_description_upload),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = colors.secondary,
+                        )
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Star,
+                                contentDescription = null,
+                                tint = colors.primary,
+                            )
+
+                            Text(
+                                text = rating.toString(),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = colors.textPrimary,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+
+                        if (isPinned) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = null,
+                                    tint = Color(0xFFAD3659),
+                                )
+
+                                Text(
+                                    text = stringResource(R.string.book_pinned_label),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = colors.secondary,
+                                )
+                            }
+                        }
+                    }
                 }
             }
 
@@ -134,6 +187,7 @@ fun BookContentLayout(
                 onAction = {
                     onTitleChanged(it)
                 },
+                readOnly = !isEditable,
             )
 
             // Author
@@ -144,48 +198,60 @@ fun BookContentLayout(
                 onAction = {
                     onAuthorChanged(it)
                 },
+                readOnly = !isEditable,
             )
 
             // Personal Rating
-            AppStarRatingBar(
-                label = stringResource(R.string.book_rating_label),
-                rating = rating,
-                onRatingChanged = { onRatingChanged(it) }
-            )
+            if (isEditable) {
+                AppStarRatingBar(
+                    label = stringResource(R.string.book_rating_label),
+                    rating = rating,
+                    onRatingChanged = { onRatingChanged(it) },
+                )
+            }
 
             // Reading dates
-            AppDataPickerField(
-                startDate = startedDate,
-                endDate = finishedDate,
-                onStartDateChange = { onStartedDateChanged(it) },
-                onEndDateChange = { onFinishedDateChanged(it) }
-            )
+            if (isEditable || (finishedDate != null && startedDate != null)) {
+                AppDataPickerField(
+                    startDate = startedDate,
+                    endDate = finishedDate,
+                    onStartDateChange = { onStartedDateChanged(it) },
+                    onEndDateChange = { onFinishedDateChanged(it) },
+                    enabled = isEditable,
+                )
+            }
 
             // Summary
-            AppTextInput(
-                label = "Summary",
-                value = summary,
-                placeholder = "What did you think about this book?",
-                singleLine = false,
-                minLines = 3,
-                height = 114.dp,
-                onAction = {
-                   onSummaryChanged(it)
-                },
-            )
+            if (isEditable || summary.isNotBlank()) {
+                AppTextInput(
+                    label = "Summary",
+                    value = summary,
+                    placeholder = "What did you think about this book?",
+                    singleLine = false,
+                    minLines = 3,
+                    height = 114.dp,
+                    onAction = {
+                        onSummaryChanged(it)
+                    },
+                    readOnly = !isEditable,
+                )
+            }
 
             // Private note
-            AppTextInput(
-                label = "A note for later · optional",
-                value = note,
-                placeholder = "A thought to revisit later...",
-                singleLine = false,
-                minLines = 2,
-                height = 82.dp,
-                onAction = {
-                   onNoteChanged(it)
-                },
-            )
+            if (isEditable || note.isNotBlank()) {
+                AppTextInput(
+                    label = "A note for later · optional",
+                    value = note,
+                    placeholder = "A thought to revisit later...",
+                    singleLine = false,
+                    minLines = 2,
+                    height = 82.dp,
+                    onAction = {
+                        onNoteChanged(it)
+                    },
+                    readOnly = !isEditable,
+                )
+            }
         }
     }
 }

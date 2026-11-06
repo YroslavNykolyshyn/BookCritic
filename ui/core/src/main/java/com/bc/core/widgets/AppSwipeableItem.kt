@@ -1,8 +1,5 @@
 package com.bc.core.widgets
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
@@ -15,12 +12,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -37,23 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.bc.core.theme.AppTheme.colors
 
-enum class BookSwipeAction {
-    PIN,
-    EDIT,
-}
-
-data class BookSwipeReveal(
-    val bookId: String,
-    val action: BookSwipeAction,
-)
-
 @Composable
 fun SwipeableBookItem(
     bookId: String,
-    activeSwipe: BookSwipeReveal?,
-    onRevealChange: (BookSwipeReveal?) -> Unit,
+    isFavorite: Boolean,
     onPinClick: () -> Unit,
-    onEditClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable (Modifier) -> Unit,
 ) {
@@ -71,62 +55,37 @@ fun SwipeableBookItem(
         label = "bookSwipeOffset",
     )
 
-    LaunchedEffect(activeSwipe) {
-        val action = activeSwipe
-            ?.takeIf { it.bookId == bookId }
-            ?.action
-
-        dragOffset = when (action) {
-            BookSwipeAction.PIN -> actionWidthPx
-            BookSwipeAction.EDIT -> -actionWidthPx
-            null -> 0f
-        }
-    }
-
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(28.dp)),
+            .clip(RoundedCornerShape(16.dp)),
     ) {
-        Box(
-            modifier = Modifier.matchParentSize(),
-        ) {
-            AnimatedVisibility(
-                visible = dragOffset > 0f,
-                modifier = Modifier.align(Alignment.CenterStart),
-                enter = EnterTransition.None,
-                exit = ExitTransition.None,
-            ) {
+        Box(modifier = Modifier.matchParentSize()) {
+            if (dragOffset > 0f) {
                 SwipeActionButton(
-                    icon = Icons.Outlined.Favorite,
-                    contentColor = Color(0xFFAD3659),
-                    contentDescription = "Pin book",
+                    icon = if (isFavorite) {
+                        Icons.Filled.Favorite
+                    } else {
+                        Icons.Outlined.FavoriteBorder
+                    },
+                    contentColor = if (isFavorite) {
+                        Color(0xFFAD3659)
+                    } else {
+                        Color.White
+                    },
+                    contentDescription = if (isFavorite) {
+                        "Unpin book"
+                    } else {
+                        "Pin book"
+                    },
+                    isActive = isFavorite,
                     modifier = Modifier
+                        .align(Alignment.CenterStart)
                         .width(actionWidth)
                         .fillMaxHeight(),
                     onClick = {
                         onPinClick()
-                        onRevealChange(null)
-                    },
-                )
-            }
-
-            AnimatedVisibility(
-                visible = dragOffset < 0f,
-                modifier = Modifier.align(Alignment.CenterEnd),
-                enter = EnterTransition.None,
-                exit = ExitTransition.None,
-            ) {
-                SwipeActionButton(
-                    icon = Icons.Outlined.Edit,
-                    contentColor = Color(0xFF405D85),
-                    contentDescription = "Edit book",
-                    modifier = Modifier
-                        .width(actionWidth)
-                        .fillMaxHeight(),
-                    onClick = {
-                        onEditClick()
-                        onRevealChange(null)
+                        dragOffset = 0f
                     },
                 )
             }
@@ -146,49 +105,19 @@ fun SwipeableBookItem(
                     detectHorizontalDragGestures(
                         onHorizontalDrag = { change, dragAmount ->
                             dragOffset = (dragOffset + dragAmount)
-                                .coerceIn(
-                                    -actionWidthPx,
-                                    actionWidthPx,
-                                )
+                                .coerceIn(0f, actionWidthPx)
 
                             change.consume()
                         },
                         onDragEnd = {
-                            val targetOffset = when {
-                                dragOffset > actionWidthPx / 2 ->
-                                    actionWidthPx
-
-                                dragOffset < -actionWidthPx / 2 ->
-                                    -actionWidthPx
-
-                                else -> 0f
+                            dragOffset = if (dragOffset > actionWidthPx / 2) {
+                                actionWidthPx
+                            } else {
+                                0f
                             }
-
-                            dragOffset = targetOffset
-
-                            val action = when (targetOffset) {
-                                actionWidthPx -> BookSwipeAction.PIN
-                                -actionWidthPx -> BookSwipeAction.EDIT
-                                else -> null
-                            }
-
-                            onRevealChange(
-                                action?.let {
-                                    BookSwipeReveal(
-                                        bookId = bookId,
-                                        action = it,
-                                    )
-                                },
-                            )
                         },
                         onDragCancel = {
-                            dragOffset = when {
-                                activeSwipe?.bookId != bookId -> 0f
-                                activeSwipe.action == BookSwipeAction.PIN ->
-                                    actionWidthPx
-
-                                else -> -actionWidthPx
-                            }
+                            dragOffset = 0f
                         },
                     )
                 },
@@ -198,20 +127,19 @@ fun SwipeableBookItem(
 
 @Composable
 private fun SwipeActionButton(
+    modifier: Modifier = Modifier,
     icon: ImageVector,
     contentColor: Color,
     contentDescription: String,
-    modifier: Modifier = Modifier,
+    isActive: Boolean = false,
     onClick: () -> Unit,
 ) {
     Surface(
         modifier = modifier.clickable(onClick = onClick),
-        color = colors.primary,
+        color = if (isActive) colors.surface else colors.primary,
         contentColor = contentColor,
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-        ) {
+        Box(contentAlignment = Alignment.Center) {
             Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,

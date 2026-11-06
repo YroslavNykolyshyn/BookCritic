@@ -67,48 +67,57 @@ fun EditLibraryBookScreen(
         containerColor = colors.background,
         topBar = {
             AppTopBar(
-                title = stringResource(R.string.edit_book_title),
+                title = if (state.isEditing) stringResource(R.string.edit_book_title) else stringResource(
+                    R.string.view_book_title
+                ),
                 onAction = {
                     onAction(EditLibraryBookUIAction.BackClicked)
                 },
                 enabled = !state.isLoading,
+                showEditAction = !state.isEditing,
+                onEditClick = {
+                    onAction(EditLibraryBookUIAction.OnEditClicked)
+                },
             )
         },
         bottomBar = {
-            AppBottomBarButton(
-                visible = isKeyBoardVisible,
-                onSaveClicked = { onAction(EditLibraryBookUIAction.OnSaveClicked) },
-                buttonEnabled = state.isLoading,
-            )
+            if (state.isEditing) {
+                AppBottomBarButton(
+                    visible = isKeyBoardVisible,
+                    onSaveClicked = { onAction(EditLibraryBookUIAction.OnSaveClicked) },
+                    buttonEnabled = state.isLoading,
+                )
 
-            AppModalBottomSheet(
-                visible = showImageSourceSheet,
-                onGalleryClick = {
-                    showImageSourceSheet = false
+                AppModalBottomSheet(
+                    visible = showImageSourceSheet,
+                    onGalleryClick = {
+                        showImageSourceSheet = false
 
-                    galleryLauncher.launch(
-                        PickVisualMediaRequest(
-                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                        galleryLauncher.launch(
+                            PickVisualMediaRequest(
+                                ActivityResultContracts.PickVisualMedia.ImageOnly
+                            )
                         )
-                    )
-                },
-                onCameraClick = {
-                    showImageSourceSheet = false
+                    },
+                    onCameraClick = {
+                        showImageSourceSheet = false
 
-                    val uri = createImageUri(context)
-                    cameraUri = uri
-                    cameraLauncher.launch(uri)
-                },
-                onDismiss = {
-                    showImageSourceSheet = false
-                },
-            )
+                        val uri = createImageUri(context)
+                        cameraUri = uri
+                        cameraLauncher.launch(uri)
+                    },
+                    onDismiss = {
+                        showImageSourceSheet = false
+                    },
+                )
+            }
         }
     ) { paddingValues ->
         if (state.isLoading) {
             AppCircularLoadingIndicator()
         } else {
             BookContentLayout(
+                isEditable = state.isEditing,
                 paddingValues = paddingValues,
                 title = state.bookItem.title,
                 author = state.bookItem.author,
@@ -117,6 +126,7 @@ fun EditLibraryBookScreen(
                 finishedDate = state.bookItem.finishedDate,
                 summary = state.bookItem.summary,
                 note = state.bookItem.note,
+                isPinned = state.bookItem.isFavorite,
                 onTitleChanged = { onAction(EditLibraryBookUIAction.OnTitleChanged(it)) },
                 onAuthorChanged = { onAction(EditLibraryBookUIAction.OnAuthorChanged(it)) },
                 onRatingChanged = { onAction(EditLibraryBookUIAction.OnRatingChanged(it)) },

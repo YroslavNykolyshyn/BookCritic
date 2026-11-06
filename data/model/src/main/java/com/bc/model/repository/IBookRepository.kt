@@ -13,4 +13,8 @@ interface IBookRepository {
         selectedCoverUri: Uri?,
     )
     suspend fun deleteBook(book: BookData)
+
+    suspend fun updateBook(book: BookData)
+
+    suspend fun toggleFavorite(bookId: String)
 }

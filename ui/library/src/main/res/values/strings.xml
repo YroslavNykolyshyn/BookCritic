@@ -3,6 +3,7 @@
     <!-- Add Book screen -->
     <string name="add_book_title">Add book</string>
     <string name="edit_book_title">Edit book</string>
+    <string name="view_book_title">View book</string>
 
     <!-- Book cover -->
     <string name="book_cover_description">Book cover</string>
@@ -10,6 +11,7 @@
     <string name="book_cover_headline">Every story has a cover</string>
     <string name="book_cover_description_upload">Choose a photo or upload your book\'s cover.</string>
     <string name="change_book_cover">Change cover</string>
+    <string name="book_pinned_label">Favorite</string>
 
     <!-- Book information -->
     <string name="book_title_label">Book title</string>

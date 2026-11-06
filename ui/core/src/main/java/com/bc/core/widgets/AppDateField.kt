@@ -26,13 +26,14 @@ fun AppDateField(
     valueColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Column(modifier = modifier) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
-                .clickable(onClick = onClick),
+                .clickable(enabled = enabled, onClick = onClick),
             shape = MaterialTheme.shapes.small,
             border = BorderStroke(
                 width = 1.dp,

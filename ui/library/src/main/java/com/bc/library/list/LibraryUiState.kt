@@ -1,9 +1,9 @@
 package com.bc.library.list
 
 data class LibraryUiState(
-    val searchQuery: String = "",
     val books: List<LibraryBookUiModel> = emptyList(),
     val isLoading: Boolean = true,
+    val searchQuery: String = "",
 )
 
 data class LibraryBookUiModel(
@@ -14,4 +14,5 @@ data class LibraryBookUiModel(
     val coverPath: String?,
     val bookSummary: String,
     val bookOptionalSummary: String,
+    val isFavorite: Boolean = false,
 )
