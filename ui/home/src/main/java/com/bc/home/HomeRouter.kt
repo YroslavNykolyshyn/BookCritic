@@ -11,5 +11,5 @@ fun HomeRouter(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    HomeScreen(uiState)
+    HomeScreen(uiState, viewModel::onAction)
 }
