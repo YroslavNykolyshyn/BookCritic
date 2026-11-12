@@ -12,6 +12,10 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val bookRepository: BookRepository
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(BookListUiState())
-    val uiState: StateFlow<BookListUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(HomeUIState())
+    val uiState: StateFlow<HomeUIState> = _uiState.asStateFlow()
+
+    fun onAction(action: HomeUIAction) {
+
+    }
 }
