@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.bc.core.theme.AppTheme
 
@@ -34,7 +35,7 @@ fun AppAddBookCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(28.dp))
             .background(AppTheme.colors.surfaceVariant)
-            .clickable(onClick = onClick)
+            .clickable(role = Role.Button, onClick = onClick)
             .padding(vertical = AppTheme.dimensions.paddingExtraMedium),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
