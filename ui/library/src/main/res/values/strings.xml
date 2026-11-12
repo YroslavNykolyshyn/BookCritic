@@ -5,30 +5,6 @@
     <string name="edit_book_title">Edit book</string>
     <string name="view_book_title">View book</string>
 
-    <!-- Book cover -->
-    <string name="book_cover_description">Book cover</string>
-    <string name="add_book_cover">Add book cover</string>
-    <string name="book_cover_headline">Every story has a cover</string>
-    <string name="book_cover_description_upload">Choose a photo or upload your book\'s cover.</string>
-    <string name="change_book_cover">Change cover</string>
-    <string name="book_pinned_label">Favorite</string>
-
-    <!-- Book information -->
-    <string name="book_title_label">Book title</string>
-    <string name="book_title_placeholder">Enter book title</string>
-    <string name="book_author_label">Author</string>
-    <string name="book_author_placeholder">Enter author name</string>
-
-    <!-- Reading status -->
-    <string name="reading_status_question">Where is this book in your story?</string>
-    <string name="reading_status_to_read">To read</string>
-    <string name="reading_status_reading">Reading now</string>
-    <string name="reading_status_already_read">Already read</string>
-
-    <string name="reading_status_to_read_description">Keep this book on your future reading list.</string>
-    <string name="reading_status_reading_description">Save your thoughts as you read.</string>
-    <string name="reading_status_already_read_description">Capture your thoughts and finish date for this completed book.</string>
-
     <!-- Rating -->
     <string name="book_rating_label">Personal rating</string>
     <string name="book_rating_placeholder">e.g. 4.5 / 5</string>
