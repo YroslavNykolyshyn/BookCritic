@@ -10,6 +10,9 @@ data object Home: NavKey
 data object AddBookInProgress: NavKey
 
 @Serializable
+data class FinishBook(val bookId: String) : NavKey
+
+@Serializable
 data object Library : NavKey
 
 @Serializable

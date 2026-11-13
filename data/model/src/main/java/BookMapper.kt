@@ -16,6 +16,8 @@ fun BookEntity.toDomain() = BookData(
     coverPath = coverPath,
     bookCost = bookCost,
     isFavorite = favorite ?: false,
+    totalPages = totalPages,
+    currentPage = currentPage,
 )
 
 fun BookData.toEntity() = BookEntity(
@@ -31,4 +33,6 @@ fun BookData.toEntity() = BookEntity(
     coverPath = coverPath,
     bookCost = bookCost,
     favorite = isFavorite,
+    totalPages = totalPages,
+    currentPage = currentPage,
 )
