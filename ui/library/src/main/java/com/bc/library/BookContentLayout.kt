@@ -37,6 +37,7 @@ import com.bc.core.theme.AppTheme.colors
 import com.bc.core.widgets.AppDataPickerField
 import com.bc.core.widgets.AppStarRatingBar
 import com.bc.core.widgets.AppTextInput
+import com.bc.core.R as CoreR
 
 @Composable
 fun BookContentLayout(
@@ -109,7 +110,7 @@ fun BookContentLayout(
                     } else {
                         Icon(
                             imageVector = Icons.Outlined.AddPhotoAlternate,
-                            contentDescription = stringResource(R.string.add_book_cover),
+                            contentDescription = stringResource(CoreR.string.add_book_cover),
                             tint = colors.primary,
                             modifier = Modifier.size(AppTheme.dimensions.iconSizeTiny),
                         )
@@ -122,14 +123,14 @@ fun BookContentLayout(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         Text(
-                            text = stringResource(R.string.book_cover_headline),
+                            text = stringResource(CoreR.string.book_cover_headline),
                             style = MaterialTheme.typography.titleLarge,
                             color = colors.textPrimary,
                             fontWeight = FontWeight.SemiBold,
                         )
 
                         Text(
-                            text = stringResource(R.string.book_cover_description_upload),
+                            text = stringResource(CoreR.string.book_cover_description_upload),
                             style = MaterialTheme.typography.bodyMedium,
                             color = colors.secondary,
                         )
@@ -169,7 +170,7 @@ fun BookContentLayout(
                                 )
 
                                 Text(
-                                    text = stringResource(R.string.book_pinned_label),
+                                    text = stringResource(CoreR.string.book_pinned_label),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = colors.secondary,
                                 )
@@ -181,9 +182,9 @@ fun BookContentLayout(
 
             // Title
             AppTextInput(
-                label = stringResource(R.string.book_title_label),
+                label = stringResource(CoreR.string.book_title_label),
                 value = title,
-                placeholder = stringResource(R.string.book_title_placeholder),
+                placeholder = stringResource(CoreR.string.book_title_placeholder),
                 onAction = {
                     onTitleChanged(it)
                 },
@@ -192,9 +193,9 @@ fun BookContentLayout(
 
             // Author
             AppTextInput(
-                label = stringResource(R.string.book_author_label),
+                label = stringResource(CoreR.string.book_author_label),
                 value = author,
-                placeholder = stringResource(R.string.book_author_placeholder),
+                placeholder = stringResource(CoreR.string.book_author_placeholder),
                 onAction = {
                     onAuthorChanged(it)
                 },

@@ -2,4 +2,22 @@
 <resources>
     <string name="rating_star_description">Rate %1$d out of %2$d stars</string>
     <string name="select_reading_period">Select reading period</string>
+
+    <string name="add_book_in_progress">Add Book In Progress</string>
+
+    <!-- Book cover -->
+    <string name="book_cover_description">Book cover</string>
+    <string name="add_book_cover">Add book cover</string>
+    <string name="book_cover_headline">Every story has a cover</string>
+    <string name="book_cover_description_upload">Choose a photo or upload your book\'s cover.</string>
+    <string name="change_book_cover">Change cover</string>
+    <string name="book_pinned_label">Favorite</string>
+
+    <!-- Book information -->
+    <string name="book_title_label">Book title</string>
+    <string name="book_title_placeholder">Enter book title</string>
+    <string name="book_author_label">Author</string>
+    <string name="book_author_placeholder">Enter author name</string>
+    <string name="book_page_count_label">Book Page Count</string>
+    <string name="book_page_count_placeholder">Enter book page count</string>
 </resources>

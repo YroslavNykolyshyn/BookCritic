@@ -7,6 +7,9 @@ import kotlinx.serialization.Serializable
 data object Home: NavKey
 
 @Serializable
+data object AddBookInProgress: NavKey
+
+@Serializable
 data object Library : NavKey
 
 @Serializable

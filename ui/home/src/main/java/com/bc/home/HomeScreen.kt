@@ -45,7 +45,8 @@ import coil3.compose.AsyncImage
 import com.bc.core.theme.AppTheme
 import com.bc.core.widgets.AppAddBookCard
 import com.bc.core.widgets.AppCircularLoadingIndicator
-import java.time.LocalDate
+import com.bc.home.book_in_progress.add.BookInProgressItem
+import com.bc.home.book_in_progress.add.BookInProgressState
 import kotlin.math.roundToInt
 
 
@@ -80,13 +81,23 @@ fun HomeScreen(
                         style = MaterialTheme.typography.headlineSmall
                     )
                 }
-                if (uiState.bookInProgress) {
-                   // TODO()
-                } else {
+                if (uiState.bookInProgressState?.bookInProgressItem == null) {
                     AppAddBookCard(
-                        onClick = {},
+                        onClick = {
+                            onAction(HomeUIAction.OnAddBookInProgress)
+                        },
                         label = "Add a book in progress",
                         description = "Track your reading journey"
+                    )
+                } else {
+                    BookInProgressItem(
+                        book = uiState.bookInProgressState.bookInProgressItem,
+                        onUpdateProgress = {
+
+                        },
+                        onFinishBook = {
+
+                        }
                     )
                 }
 
@@ -118,8 +129,8 @@ fun HomeScreen(
 
 
 @Composable
-private fun LibraryBookItem(
-    book: BookInProgress,
+private fun BookInProgressItem(
+    book: BookInProgressItem,
     modifier: Modifier = Modifier,
     onUpdateProgress: () -> Unit,
     onFinishBook: () -> Unit,
@@ -322,7 +333,7 @@ private fun ReadingActionButton(
 
 @Composable
 private fun BookCover(
-    book: BookInProgress,
+    book: BookInProgressItem,
     modifier: Modifier = Modifier,
 ) {
     AsyncImage(
