@@ -1,4 +1,4 @@
-package com.bc.library
+package com.bc.core.widgets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,9 +34,6 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.bc.core.theme.AppTheme
 import com.bc.core.theme.AppTheme.colors
-import com.bc.core.widgets.AppDataPickerField
-import com.bc.core.widgets.AppStarRatingBar
-import com.bc.core.widgets.AppTextInput
 import com.bc.core.R as CoreR
 
 @Composable
@@ -205,7 +202,7 @@ fun BookContentLayout(
             // Personal Rating
             if (isEditable) {
                 AppStarRatingBar(
-                    label = stringResource(R.string.book_rating_label),
+                    label = stringResource(CoreR.string.book_rating_label),
                     rating = rating,
                     onRatingChanged = { onRatingChanged(it) },
                 )

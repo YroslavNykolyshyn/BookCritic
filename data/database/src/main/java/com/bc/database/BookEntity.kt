@@ -18,4 +18,6 @@ data class BookEntity(
     val coverPath: String? = null,
     val bookCost: Long? = null,
     val favorite: Boolean? = null,
+    val totalPages: Long? = null,
+    val currentPage: Long? = null,
 )

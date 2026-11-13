@@ -2,6 +2,7 @@ package com.bc.home.book_in_progress.add
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,6 +45,9 @@ import coil3.compose.AsyncImage
 import com.bc.core.R
 import com.bc.core.theme.AppTheme
 import com.bc.core.theme.AppTheme.colors
+import com.bc.core.utils.CameraImageProvider.createImageUri
+import com.bc.core.widgets.AppBottomBarButton
+import com.bc.core.widgets.AppModalBottomSheet
 import com.bc.core.widgets.AppNumberInput
 import com.bc.core.widgets.AppTextInput
 import com.bc.core.widgets.AppTopBar
@@ -83,7 +87,7 @@ fun BookInProgressScreen(
 
     val isKeyBoardVisible = WindowInsets.isImeVisible
 
-    val state = state.bookInProgressItem
+    val item = state.bookInProgressItem
 
     Scaffold(
         topBar = {
@@ -91,6 +95,36 @@ fun BookInProgressScreen(
                 title = stringResource(R.string.add_book_in_progress),
                 onAction = {
                     onAction(BookInProgressUIAction.OnBackClicked)
+                },
+            )
+        },
+        bottomBar = {
+            AppBottomBarButton(
+                visible = isKeyBoardVisible,
+                onSaveClicked = { onAction(BookInProgressUIAction.OnSaveClicked) },
+                buttonEnabled = state.isSaving,
+            )
+
+            AppModalBottomSheet(
+                visible = showImageSourceSheet,
+                onGalleryClick = {
+                    showImageSourceSheet = false
+
+                    galleryLauncher.launch(
+                        PickVisualMediaRequest(
+                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
+                    )
+                },
+                onCameraClick = {
+                    showImageSourceSheet = false
+
+                    val uri = createImageUri(context)
+                    cameraUri = uri
+                    cameraLauncher.launch(uri)
+                },
+                onDismiss = {
+                    showImageSourceSheet = false
                 },
             )
         }
@@ -130,9 +164,9 @@ fun BookInProgressScreen(
                             .clickable(onClick = { showImageSourceSheet = true }),
                         contentAlignment = Alignment.Center,
                     ) {
-                        if (!state?.selectedCoverUri.isNullOrBlank()) {
+                        if (!item.selectedCoverUri.isNullOrBlank()) {
                             AsyncImage(
-                                model = state.selectedCoverUri,
+                                model = item.selectedCoverUri,
                                 contentDescription = "Book cover",
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop,
@@ -168,7 +202,7 @@ fun BookInProgressScreen(
                 // Title
                 AppTextInput(
                     label = stringResource(R.string.book_title_label),
-                    value = state.name,
+                    value = item.name,
                     placeholder = stringResource(R.string.book_title_placeholder),
                     onAction = {
                         onAction(BookInProgressUIAction.OnTitleChanged(it))
@@ -178,7 +212,7 @@ fun BookInProgressScreen(
                 // Author
                 AppTextInput(
                     label = stringResource(R.string.book_author_label),
-                    value = state.author,
+                    value = item.author,
                     placeholder = stringResource(R.string.book_author_placeholder),
                     onAction = {
                         onAction(BookInProgressUIAction.OnAuthorChanged(it))
@@ -188,7 +222,7 @@ fun BookInProgressScreen(
                 // Page Count
                 AppNumberInput(
                     label = stringResource(R.string.book_page_count_label),
-                    value = state.totalPages,
+                    value = item.totalPages,
                     placeholder = stringResource(R.string.book_page_count_placeholder),
                     onAction = {
                         onAction(BookInProgressUIAction.OnPageChanged(it))

@@ -20,4 +20,5 @@
     <string name="book_author_placeholder">Enter author name</string>
     <string name="book_page_count_label">Book Page Count</string>
     <string name="book_page_count_placeholder">Enter book page count</string>
+    <string name="book_rating_label">Personal rating</string>
 </resources>
