@@ -6,6 +6,7 @@ import com.bc.core.navigation.AddLibraryBook
 import com.bc.core.navigation.EditLibraryBook
 import com.bc.core.navigation.INavigation
 import com.bc.model.repository.IBookRepository
+import com.bc.model.repository.ReadingStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -58,7 +59,9 @@ class LibraryViewModel @Inject constructor(
     private fun observeBooks() {
         viewModelScope.launch {
             combine(
-                bookRepository.observeBooks(),
+                bookRepository.observeBooks().map { books ->
+                    books.filter { it.status == ReadingStatus.ALREADY_READ }
+                },
                 uiState.map { it.searchQuery }
                     .distinctUntilChanged(),
             ) { books, query ->

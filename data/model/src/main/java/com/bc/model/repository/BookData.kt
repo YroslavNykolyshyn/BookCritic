@@ -13,6 +13,8 @@ data class BookData(
     val coverPath: String? = null,
     val bookCost: Long? = null,
     val isFavorite: Boolean = false,
+    val totalPages: Long? = null,
+    val currentPage: Long? = null,
 )
 
 enum class ReadingStatus(val value: String) {

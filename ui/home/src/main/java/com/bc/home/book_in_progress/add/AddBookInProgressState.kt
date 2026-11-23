@@ -4,6 +4,7 @@ import com.bc.model.repository.ReadingStatus
 
 data class BookInProgressState(
     val bookInProgressItem: BookInProgressItem = BookInProgressItem(),
+    val isSaving: Boolean = false,
 )
 
 data class BookInProgressItem(
@@ -15,9 +16,3 @@ data class BookInProgressItem(
     val bookStatus: ReadingStatus = ReadingStatus.READING,
     val selectedCoverUri: String? = null,
     )
-
-data class BookCompletionDetails(
-    val rating: Float = 0f,
-    val summary: String = "",
-    val note: String = "",
-)

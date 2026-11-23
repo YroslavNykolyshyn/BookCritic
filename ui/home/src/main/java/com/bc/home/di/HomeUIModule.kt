@@ -2,9 +2,11 @@ package com.bc.home.di
 
 import com.bc.core.navigation.AddBookInProgress
 import com.bc.core.navigation.EntryProviderInstaller
+import com.bc.core.navigation.FinishBook
 import com.bc.core.navigation.Home
 import com.bc.home.HomeRouter
 import com.bc.home.book_in_progress.add.BookInProgressRouter
+import com.bc.home.book_in_progress.finish.FinishBookRouter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,6 +24,9 @@ class HomeUIModule {
         }
         entry<AddBookInProgress> {
             BookInProgressRouter()
+        }
+        entry<FinishBook> { data ->
+            FinishBookRouter(data)
         }
     }
 }

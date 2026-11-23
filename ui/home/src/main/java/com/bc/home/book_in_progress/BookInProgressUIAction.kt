@@ -10,5 +10,5 @@ sealed interface BookInProgressUIAction {
 
     data class OnTitleChanged(val value: String) : BookInProgressUIAction
     data class OnAuthorChanged(val value: String) : BookInProgressUIAction
-    data class OnPageChanged(val page: Int) : BookInProgressUIAction
+    data class OnPageChanged(val value: Int) : BookInProgressUIAction
 }

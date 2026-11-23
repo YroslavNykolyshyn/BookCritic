@@ -1,10 +1,9 @@
 package com.bc.home
 
-import com.bc.home.book_in_progress.add.BookInProgressState
+import com.bc.model.repository.BookData
 
 data class HomeUIState(
     val isLoading: Boolean = false,
-    val bookInProgressState: BookInProgressState? = null,
+    val bookInProgress: BookData? = null,
     val error: String? = null,
-    val currentPage: Int = 0,
 )

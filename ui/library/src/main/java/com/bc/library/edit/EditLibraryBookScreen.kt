@@ -24,7 +24,7 @@ import com.bc.core.widgets.AppBottomBarButton
 import com.bc.core.widgets.AppCircularLoadingIndicator
 import com.bc.core.widgets.AppModalBottomSheet
 import com.bc.core.widgets.AppTopBar
-import com.bc.library.BookContentLayout
+import com.bc.core.widgets.BookContentLayout
 import com.bc.library.R
 
 @OptIn(ExperimentalLayoutApi::class)

@@ -11,25 +11,25 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,8 +45,7 @@ import coil3.compose.AsyncImage
 import com.bc.core.theme.AppTheme
 import com.bc.core.widgets.AppAddBookCard
 import com.bc.core.widgets.AppCircularLoadingIndicator
-import com.bc.home.book_in_progress.add.BookInProgressItem
-import com.bc.home.book_in_progress.add.BookInProgressState
+import com.bc.model.repository.BookData
 import kotlin.math.roundToInt
 
 
@@ -81,7 +80,7 @@ fun HomeScreen(
                         style = MaterialTheme.typography.headlineSmall
                     )
                 }
-                if (uiState.bookInProgressState?.bookInProgressItem == null) {
+                if (uiState.bookInProgress == null) {
                     AppAddBookCard(
                         onClick = {
                             onAction(HomeUIAction.OnAddBookInProgress)
@@ -91,12 +90,12 @@ fun HomeScreen(
                     )
                 } else {
                     BookInProgressItem(
-                        book = uiState.bookInProgressState.bookInProgressItem,
+                        book = uiState.bookInProgress,
                         onUpdateProgress = {
-
+                            onAction(HomeUIAction.OnCurrentPageChanged(it))
                         },
                         onFinishBook = {
-
+                            onAction(HomeUIAction.OnFinishBookInProgress(uiState.bookInProgress.id))
                         }
                     )
                 }
@@ -130,20 +129,29 @@ fun HomeScreen(
 
 @Composable
 private fun BookInProgressItem(
-    book: BookInProgressItem,
+    book: BookData,
     modifier: Modifier = Modifier,
-    onUpdateProgress: () -> Unit,
+    onUpdateProgress: (Long) -> Unit,
     onFinishBook: () -> Unit,
 ) {
     val colors = AppTheme.colors
 
-    val progress = remember(book.currentPage, book.totalPages) {
-        if (book.totalPages > 0) {
-            (book.currentPage.toFloat() / book.totalPages)
-                .coerceIn(0f, 1f)
-        } else {
-            0f
-        }
+    val currentPage = book.currentPage ?: 0L
+    val totalPages = book.totalPages ?: 0L
+
+    val sliderState = rememberSliderState(
+        value = currentPage.toFloat(),
+        trackRange = 0f..totalPages.toFloat().coerceAtLeast(1f),
+    )
+
+    LaunchedEffect(book.id, currentPage) {
+        sliderState.value = currentPage.toFloat()
+    }
+
+    val progress = if (totalPages > 0) {
+        (sliderState.value / totalPages).coerceIn(0f, 1f)
+    } else {
+        0f
     }
 
     Column(
@@ -193,7 +201,7 @@ private fun BookInProgressItem(
                 )
 
                 Text(
-                    text = book.name,
+                    text = book.title,
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontFamily = FontFamily.Serif,
                     ),
@@ -222,8 +230,8 @@ private fun BookInProgressItem(
                 Text(
                     text = stringResource(
                         R.string.reading_progress_pages,
-                        book.currentPage,
-                        book.totalPages,
+                        sliderState.value.roundToInt(),
+                        totalPages,
                     ),
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.titleMedium,
@@ -238,29 +246,29 @@ private fun BookInProgressItem(
                 )
             }
 
-            LinearProgressIndicator(
-                progress = { progress },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(CircleShape),
-                color = colors.primary,
-                trackColor = colors.border,
+            Slider(
+                state = sliderState,
+                enabled = totalPages > 0,
+                onValueChange = { value ->
+                    sliderState.value = value
+                },
+                onValueChangeFinished = {
+                    onUpdateProgress(sliderState.value.roundToInt().toLong())
+                },
+                colors = SliderDefaults.colors(
+                    thumbColor = colors.primary,
+                    activeTrackColor = colors.primary,
+                    inactiveTrackColor = colors.border,
+                    activeTickColor = colors.surface,
+                    inactiveTickColor = colors.border,
+                ),
             )
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.Center,
         ) {
-            ReadingActionButton(
-                text = stringResource(R.string.update_progress),
-                icon = Icons.AutoMirrored.Outlined.MenuBook,
-                onClick = { onUpdateProgress() },
-                modifier = Modifier.weight(1f),
-                primary = true,
-            )
-
             ReadingActionButton(
                 text = stringResource(R.string.finish_book),
                 icon = Icons.Default.Check,
@@ -333,7 +341,7 @@ private fun ReadingActionButton(
 
 @Composable
 private fun BookCover(
-    book: BookInProgressItem,
+    book: BookData,
     modifier: Modifier = Modifier,
 ) {
     AsyncImage(
