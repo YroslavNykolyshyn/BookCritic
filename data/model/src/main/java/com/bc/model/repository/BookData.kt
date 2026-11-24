@@ -21,4 +21,11 @@ enum class ReadingStatus(val value: String) {
     TO_READ("to_read"),
     READING("reading"),
     ALREADY_READ("already_read"),
+    NONE("none");
+
+    companion object {
+        fun fromValue(value: String): ReadingStatus =
+            entries.firstOrNull { it.value == value }
+                ?: NONE
+    }
 }

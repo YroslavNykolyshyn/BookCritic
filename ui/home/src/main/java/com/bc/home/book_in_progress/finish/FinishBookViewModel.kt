@@ -45,6 +45,7 @@ class FinishBookViewModel @AssistedInject constructor(
                 update { copy(note = action.note) }
 
             FinishBookUIAction.OnConfirm -> finishBook()
+            FinishBookUIAction.OnBackPressed -> navigation.goBack()
         }
     }
 

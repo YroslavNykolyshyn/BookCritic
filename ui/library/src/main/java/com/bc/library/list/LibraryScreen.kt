@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.bc.core.theme.AppTheme
 import com.bc.core.theme.AppTheme.colors
+import com.bc.core.theme.DMSerifDisplay
 import com.bc.core.theme.MaterialAppTheme
 import com.bc.core.widgets.AppCircularLoadingIndicator
 import com.bc.core.widgets.SwipeableBookItem
@@ -133,7 +134,9 @@ fun LibraryScreen(
                         ) {
                             Text(
                                 text = "Already read",
-                                style = MaterialTheme.typography.displaySmall,
+                                style = MaterialTheme.typography.displaySmall.copy(
+                                    fontFamily = DMSerifDisplay,
+                                ),
                                 color = colors.textPrimary,
                                 fontWeight = FontWeight.Bold,
                             )

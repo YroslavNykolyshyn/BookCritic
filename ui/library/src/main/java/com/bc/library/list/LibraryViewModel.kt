@@ -58,6 +58,9 @@ class LibraryViewModel @Inject constructor(
 
     private fun observeBooks() {
         viewModelScope.launch {
+            _uiState.update {
+                it.copy(isLoading = true)
+            }
             combine(
                 bookRepository.observeBooks().map { books ->
                     books.filter { it.status == ReadingStatus.ALREADY_READ }
