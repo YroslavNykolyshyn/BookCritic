@@ -43,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.bc.core.theme.AppTheme
+import com.bc.core.theme.DMSerifDisplay
 import com.bc.core.widgets.AppAddBookCard
 import com.bc.core.widgets.AppCircularLoadingIndicator
 import com.bc.model.repository.BookData
@@ -77,7 +78,9 @@ fun HomeScreen(
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = "Your current chapter",
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontFamily = DMSerifDisplay,
+                        )
                     )
                 }
                 if (uiState.bookInProgress == null) {
@@ -103,7 +106,9 @@ fun HomeScreen(
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = "Your to-read shelf",
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontFamily = DMSerifDisplay,
+                        )
                     )
                 }
                 AppAddBookCard(

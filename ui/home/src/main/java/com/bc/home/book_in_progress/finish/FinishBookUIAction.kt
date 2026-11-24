@@ -5,4 +5,5 @@ sealed interface FinishBookUIAction {
     data class OnSummaryChanged(val summary: String) : FinishBookUIAction
     data class OnNoteChanged(val note: String) : FinishBookUIAction
     data object OnConfirm : FinishBookUIAction
+    data object OnBackPressed: FinishBookUIAction
 }

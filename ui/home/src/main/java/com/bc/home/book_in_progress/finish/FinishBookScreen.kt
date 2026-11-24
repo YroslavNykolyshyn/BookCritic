@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.bc.core.R
 import com.bc.core.widgets.AppBottomBarButton
+import com.bc.core.widgets.AppTopBar
 import com.bc.core.widgets.BookContentLayout
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -16,6 +19,14 @@ fun FinishBookScreen(
 ) {
     val isKeyBoardVisible = WindowInsets.isImeVisible
     Scaffold(
+        topBar = {
+            AppTopBar(
+                title = stringResource(R.string.finish_book_in_progress),
+                onAction = {
+                    onAction(FinishBookUIAction.OnBackPressed)
+                },
+            )
+        },
         bottomBar = {
             AppBottomBarButton(
                 visible = isKeyBoardVisible,

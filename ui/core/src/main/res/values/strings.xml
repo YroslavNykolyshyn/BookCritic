@@ -4,6 +4,7 @@
     <string name="select_reading_period">Select reading period</string>
 
     <string name="add_book_in_progress">Add Book In Progress</string>
+    <string name="finish_book_in_progress">Finish Book In Progress</string>
 
     <!-- Book cover -->
     <string name="book_cover_description">Book cover</string>
