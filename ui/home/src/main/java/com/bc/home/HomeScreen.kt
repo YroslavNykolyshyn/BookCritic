@@ -46,6 +46,7 @@ import com.bc.core.theme.AppTheme
 import com.bc.core.theme.DMSerifDisplay
 import com.bc.core.widgets.AppAddBookCard
 import com.bc.core.widgets.AppCircularLoadingIndicator
+import com.bc.core.widgets.displayName
 import com.bc.model.repository.BookData
 import kotlin.math.roundToInt
 
@@ -218,6 +219,14 @@ private fun BookInProgressItem(
 
                 Text(
                     text = book.author,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = colors.textSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+
+                Text(
+                    text = book.genre?.displayName() ?: "",
                     style = MaterialTheme.typography.titleMedium,
                     color = colors.textSecondary,
                     maxLines = 1,

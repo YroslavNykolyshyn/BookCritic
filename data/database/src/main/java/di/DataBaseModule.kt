@@ -3,7 +3,10 @@ package di
 import com.bc.database.BookDatabase
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.bc.database.BookDao
+import com.bc.database.genre.BookGenreDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,4 +35,9 @@ object DatabaseModule {
     fun provideBookDao(
         database: BookDatabase
     ): BookDao = database.bookDao()
+
+    @Provides
+    fun provideBookGenreDao(
+        database: BookDatabase
+    ): BookGenreDao = database.bookGenreDao()
 }

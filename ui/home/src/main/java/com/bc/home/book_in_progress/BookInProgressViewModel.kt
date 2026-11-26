@@ -7,12 +7,17 @@ import com.bc.core.navigation.INavigation
 import com.bc.home.book_in_progress.add.BookInProgressItem
 import com.bc.home.book_in_progress.add.BookInProgressState
 import com.bc.model.repository.BookData
+import com.bc.model.repository.BookGenre
+import com.bc.model.repository.BookGenres
 import com.bc.model.repository.IBookRepository
 import com.bc.model.repository.ReadingStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -25,6 +30,22 @@ class BookInProgressViewModel @Inject constructor(
 ): ViewModel() {
     private val _uiState = MutableStateFlow(BookInProgressState())
     val uiState: StateFlow<BookInProgressState> = _uiState.asStateFlow()
+
+    val genres: StateFlow<List<BookGenre>> = bookRepository.observeGenres()
+        .map { list ->
+            val (predefined, custom) = list.partition { it.id in BookGenres.ordered }
+            predefined.sortedBy { BookGenres.ordered.indexOf(it.id) } +
+                    custom.sortedBy { it.name.lowercase() }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    init {
+        viewModelScope.launch {
+            genres.collect { genres ->
+                _uiState.update { it.copy(genres = genres) }
+            }
+        }
+    }
 
     fun onAction(action: BookInProgressUIAction) {
         when(action) {
@@ -52,6 +73,15 @@ class BookInProgressViewModel @Inject constructor(
                     copy(author = action.value)
                 }
             }
+
+            is BookInProgressUIAction.OnAddCustomGenre -> {
+                addCustomGenre(action.value)
+            }
+            is BookInProgressUIAction.OnGenreSelected -> {
+               updateBookItem {
+                   copy(genre = action.value)
+               }
+            }
         }
     }
 
@@ -67,10 +97,20 @@ class BookInProgressViewModel @Inject constructor(
                     status = ReadingStatus.READING,
                     totalPages = item.totalPages.toLong(),
                     currentPage = item.currentPage.toLong(),
+                    genre = item.genre,
                 ),
                 selectedCoverUri = item.selectedCoverUri?.let(Uri::parse),
             )
             navigation.goBack()
+        }
+    }
+
+    fun addCustomGenre(name: String) {
+        viewModelScope.launch {
+            val newGenre = bookRepository.addCustomGenre(name)
+            updateBookItem {
+                copy(genre = newGenre)
+            }
         }
     }
 

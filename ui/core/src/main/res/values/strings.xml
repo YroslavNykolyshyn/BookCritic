@@ -22,4 +22,20 @@
     <string name="book_page_count_label">Book Page Count</string>
     <string name="book_page_count_placeholder">Enter book page count</string>
     <string name="book_rating_label">Personal rating</string>
+
+    <!-- Book genre -->
+    <string name="genre_fiction">Fiction</string>
+    <string name="genre_fantasy">Fantasy</string>
+    <string name="genre_science_fiction">Science Fiction</string>
+    <string name="genre_mystery">Mystery</string>
+    <string name="genre_thriller">Thriller</string>
+    <string name="genre_romance">Romance</string>
+    <string name="genre_horror">Horror</string>
+    <string name="genre_historical_fiction">Historical Fiction</string>
+    <string name="genre_adventure">Adventure</string>
+    <string name="genre_biography">Biography</string>
+    <string name="genre_history">History</string>
+    <string name="genre_self_help">Self-Help</string>
+    <string name="genre_psychology">Psychology</string>
+    <string name="genre_philosophy">Philosophy</string>
 </resources>

@@ -17,4 +17,11 @@ interface IBookRepository {
     suspend fun updateBook(book: BookData)
 
     suspend fun toggleFavorite(bookId: String)
+
+    // Genre
+    fun observeGenres(): Flow<List<BookGenre>>
+
+    suspend fun addCustomGenre(name: String): BookGenre
+
+    suspend fun seedPredefinedGenres()
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -51,6 +52,7 @@ import com.bc.core.widgets.AppModalBottomSheet
 import com.bc.core.widgets.AppNumberInput
 import com.bc.core.widgets.AppTextInput
 import com.bc.core.widgets.AppTopBar
+import com.bc.core.widgets.BookGenreDropdown
 import com.bc.home.book_in_progress.BookInProgressUIAction
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -90,6 +92,7 @@ fun BookInProgressScreen(
     val item = state.bookInProgressItem
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.add_book_in_progress),
@@ -217,6 +220,15 @@ fun BookInProgressScreen(
                     onAction = {
                         onAction(BookInProgressUIAction.OnAuthorChanged(it))
                     },
+                )
+
+                BookGenreDropdown(
+                    genres = state.genres,
+                    selectedGenreId = state.bookInProgressItem.genre?.id,
+                    onGenreSelected = { genreId ->
+                        onAction(BookInProgressUIAction.OnGenreSelected(state.genres.firstOrNull { it.id == genreId }))
+                    },
+                    onAddCustomGenre = { onAction(BookInProgressUIAction.OnAddCustomGenre(it)) },
                 )
 
                 // Page Count
