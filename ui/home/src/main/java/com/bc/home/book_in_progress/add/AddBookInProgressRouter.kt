@@ -11,5 +11,7 @@ fun BookInProgressRouter(
     viewModel: BookInProgressViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    BookInProgressScreen(state = uiState, onAction = viewModel::onAction)
+    val genres by viewModel.genres.collectAsStateWithLifecycle()
+
+    BookInProgressScreen(state = uiState, genres = genres, onAction = viewModel::onAction)
 }

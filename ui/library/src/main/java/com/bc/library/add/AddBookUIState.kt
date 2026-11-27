@@ -1,5 +1,6 @@
 package com.bc.library.add
 
+import com.bc.model.repository.BookGenre
 import com.bc.model.repository.ReadingStatus
 
 data class AddBookUiState(
@@ -11,6 +12,7 @@ data class AddBookUiState(
 data class AddBookItem(
     val title: String = "",
     val author: String = "",
+    val genre: BookGenre? = null,
     val status: ReadingStatus = ReadingStatus.ALREADY_READ,
     val rating: Float = 0f,
     val startedDate: Long? = null,

@@ -3,15 +3,26 @@ package com.bc.model.repository
 import android.net.Uri
 import android.util.Log
 import com.bc.database.BookDao
+import com.bc.database.genre.BookGenreDao
+import com.bc.database.genre.BookGenreEntity
+import com.bc.model.repository.di.ApplicationScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import toDomain
 import toEntity
+import java.util.UUID
 import javax.inject.Inject
 
 class BookRepository @Inject constructor(
     private val dao: BookDao,
+    private val bookGenreDao: BookGenreDao,
     private val coverStorage: BookCoverStorage,
+    @ApplicationScope appScope: CoroutineScope,
 ) : IBookRepository {
     override fun observeBooks(): Flow<List<BookData>> =
         dao.observeBooks().map { entities ->
@@ -84,6 +95,39 @@ class BookRepository @Inject constructor(
     override suspend fun toggleFavorite(bookId: String) {
         dao.toggleFavorite(bookId)
     }
+
+    private val genreOrder = BookGenres.ordered.withIndex().associate { it.value to it.index }
+
+    override val genres: StateFlow<List<BookGenre>> = bookGenreDao.observeGenres()
+        .map { entities ->
+            val (predefined, custom) = entities.map { it.toDomain() }.partition { !it.isCustom }
+            predefined.sortedBy { genreOrder[it.id] } + custom.sortedBy { it.name.lowercase() }
+        }
+        .distinctUntilChanged()
+        .stateIn(appScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    override suspend fun addCustomGenre(name: String): BookGenre {
+        val normalizedName = name.trim()
+
+        require(normalizedName.isNotBlank())
+
+        val genre = BookGenre(
+            id = UUID.randomUUID().toString(),
+            name = normalizedName,
+            isCustom = true,
+        )
+
+        bookGenreDao.insertGenre(genre.toEntity())
+
+        return genre
+    }
+
+    override suspend fun seedPredefinedGenres() {
+        bookGenreDao.insertGenres(
+            BookGenres.ordered.map { BookGenreEntity(id = it, name = it, isCustom = true) }
+        )
+    }
+
 
     companion object {
         private const val TAG = "BookRepository"

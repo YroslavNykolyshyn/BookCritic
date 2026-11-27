@@ -12,5 +12,6 @@ fun FinishBookRouter(data: FinishBook) {
         factory.create(data.bookId)
     }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    FinishBookScreen(state = state, onAction = viewModel::onAction)
+    val genres by viewModel.genres.collectAsStateWithLifecycle()
+    FinishBookScreen(state = state, genres = genres, onAction = viewModel::onAction)
 }

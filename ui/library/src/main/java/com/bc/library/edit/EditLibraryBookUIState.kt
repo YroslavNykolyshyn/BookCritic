@@ -1,14 +1,17 @@
 package com.bc.library.edit
 
+import com.bc.model.repository.BookGenre
+
 data class EditLibraryBookUIState(
     val isLoading: Boolean = false,
     val bookItem: EditLibraryBookItem = EditLibraryBookItem(),
     val isEditing: Boolean = false,
-)
+    )
 
 data class EditLibraryBookItem(
     val title: String = "",
     val author: String = "",
+    val genre: BookGenre? = null,
     val rating: Float = 0f,
     val startedDate: Long? = null,
     val finishedDate: Long? = null,

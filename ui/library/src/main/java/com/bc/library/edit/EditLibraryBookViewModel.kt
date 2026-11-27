@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bc.core.navigation.INavigation
 import com.bc.model.repository.BookData
+import com.bc.model.repository.BookGenre
 import com.bc.model.repository.IBookRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -20,12 +21,13 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = EditLibraryBookViewModel.Factory::class)
 class EditLibraryBookViewModel @AssistedInject constructor(
     @Assisted val bookId: String,
-    private val repository: IBookRepository,
+    private val bookRepository: IBookRepository,
     private val navigation: INavigation,) : ViewModel() {
     private val _uiState = MutableStateFlow(EditLibraryBookUIState())
     val uiState: StateFlow<EditLibraryBookUIState> = _uiState.asStateFlow()
 
     private var originalBook: BookData? = null
+    val genres: StateFlow<List<BookGenre>> = bookRepository.genres
 
     @AssistedFactory
     interface Factory {
@@ -43,7 +45,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
             }
 
             try {
-                val book = repository.getBookById(bookId)
+                val book = bookRepository.getBookById(bookId)
                 originalBook = book
 
                 _uiState.update { currentState ->
@@ -56,6 +58,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
                             bookItem = EditLibraryBookItem(
                                 title = book.title,
                                 author = book.author,
+                                genre = book.genre,
                                 rating = book.rating ?: 0f,
                                 startedDate = book.startedDate,
                                 finishedDate = book.finishedDate,
@@ -129,6 +132,13 @@ class EditLibraryBookViewModel @AssistedInject constructor(
             is EditLibraryBookUIAction.OnNoteChanged -> updateBookItem {
                 copy(note = action.value)
             }
+
+            is EditLibraryBookUIAction.OnCustomGenreAdded -> {
+                addCustomGenre(action.name)
+            }
+            is EditLibraryBookUIAction.OnGenreChanged -> updateBookItem {
+                copy(genre = action.genre)
+            }
         }
     }
 
@@ -155,6 +165,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
                 id = bookId,
                 title = item.title,
                 author = item.author,
+                genre = item.genre,
                 rating = item.rating,
                 startedDate = item.startedDate,
                 finishedDate = item.finishedDate,
@@ -167,7 +178,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
 
             val selectedCoverUri = item.selectedCoverUri?.let(Uri::parse)
 
-            repository.saveBook(
+            bookRepository.saveBook(
                 book = bookItem,
                 selectedCoverUri = selectedCoverUri,
             )
@@ -187,6 +198,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
 
         return current.title != original.title ||
                 current.author != original.author ||
+                current.genre?.id != original.genre?.id ||
                 current.rating != (original.rating ?: 0f) ||
                 current.startedDate != original.startedDate ||
                 current.finishedDate != original.finishedDate ||
@@ -195,6 +207,15 @@ class EditLibraryBookViewModel @AssistedInject constructor(
                 current.bookCover != original.coverPath ||
                 current.selectedCoverUri != null ||
                 current.bookCost.trim().toLongOrNull() != original.bookCost
+    }
+
+    fun addCustomGenre(name: String) {
+        viewModelScope.launch {
+            val newGenre = bookRepository.addCustomGenre(name)
+            updateBookItem {
+                copy(genre = newGenre)
+            }
+        }
     }
 
     private fun updateBookItem(

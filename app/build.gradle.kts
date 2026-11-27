@@ -39,6 +39,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":data:model"))
     implementation(project(":ui:library"))
     implementation(project(":ui:home"))
     implementation(project(":ui:core"))

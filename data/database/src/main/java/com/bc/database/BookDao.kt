@@ -11,13 +11,13 @@ import kotlinx.coroutines.flow.Flow
 interface BookDao {
 
     @Query("SELECT * FROM book ORDER BY title COLLATE NOCASE ASC")
-    fun observeBooks(): Flow<List<BookEntity>>
+    fun observeBooks(): Flow<List<BookWithGenre>>
 
     @Query("SELECT * FROM book WHERE id = :id")
-    fun observeBookById(id: String): Flow<BookEntity?>
+    fun observeBookById(id: String): Flow<BookWithGenre?>
 
     @Query("SELECT * FROM book WHERE id = :id")
-    suspend fun getBookById(id: String): BookEntity?
+    suspend fun getBookById(id: String): BookWithGenre?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBook(bookEntity: BookEntity)

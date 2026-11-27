@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bc.core.navigation.INavigation
 import com.bc.model.repository.BookData
+import com.bc.model.repository.BookGenre
 import com.bc.model.repository.IBookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +27,7 @@ class AddBookViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(AddBookUiState())
     val uiState: StateFlow<AddBookUiState> = _uiState.asStateFlow()
+    val genres: StateFlow<List<BookGenre>> = bookRepository.genres
 
     init {
         observeReadBookCount()
@@ -33,50 +35,58 @@ class AddBookViewModel @Inject constructor(
 
     fun onAction(action: AddBookUIAction) {
         when (action) {
-            AddBookUIAction.BackClicked -> {
+            AddBookUIAction.OnBackClicked -> {
                 navigation.goBack()
             }
 
-            is AddBookUIAction.CoverSelected -> {
+            is AddBookUIAction.OnCoverSelected -> {
                 onCoverSelected(action.uri)
             }
 
-            AddBookUIAction.SaveClicked -> {
+            AddBookUIAction.OnSaveClicked -> {
                 viewModelScope.launch {
                     saveBook()
                 }
             }
 
-            is AddBookUIAction.TitleChanged -> updateBookItem {
+            is AddBookUIAction.OnTitleChanged -> updateBookItem {
                 copy(title = action.value)
             }
 
-            is AddBookUIAction.AuthorChanged -> updateBookItem {
+            is AddBookUIAction.OnAuthorChanged -> updateBookItem {
                 copy(author = action.value)
             }
 
-            is AddBookUIAction.StatusChanged -> updateBookItem {
+            is AddBookUIAction.OnStatusChanged -> updateBookItem {
                 copy(status = action.value)
             }
 
-            is AddBookUIAction.RatingChanged -> updateBookItem {
+            is AddBookUIAction.OnRatingChanged -> updateBookItem {
                 copy(rating = action.value)
             }
 
-            is AddBookUIAction.StartedDateChanged -> updateBookItem {
+            is AddBookUIAction.OnStartedDateChanged -> updateBookItem {
                 copy(startedDate = action.value)
             }
 
-            is AddBookUIAction.FinishedDateChanged -> updateBookItem {
+            is AddBookUIAction.OnFinishedDateChanged -> updateBookItem {
                 copy(finishedDate = action.value)
             }
 
-            is AddBookUIAction.SummaryChanged -> updateBookItem {
+            is AddBookUIAction.OnSummaryChanged -> updateBookItem {
                 copy(summary = action.value)
             }
 
-            is AddBookUIAction.NoteChanged -> updateBookItem {
+            is AddBookUIAction.OnNoteChanged -> updateBookItem {
                 copy(note = action.value)
+            }
+
+            is AddBookUIAction.OnGenreChanged -> updateBookItem {
+                copy(genre = action.genre)
+            }
+
+            is AddBookUIAction.OnCustomGenreAdded -> {
+                addCustomGenre(action.name)
             }
         }
     }
@@ -99,6 +109,7 @@ class AddBookViewModel @Inject constructor(
                 id = UUID.randomUUID().toString(),
                 title = title,
                 author = item.author.trim(),
+                genre = item.genre,
                 status = item.status,
                 rating = item.rating,
                 startedDate = item.startedDate,
@@ -140,6 +151,15 @@ class AddBookViewModel @Inject constructor(
                         readBookCount = count
                     )
                 }
+            }
+        }
+    }
+
+    fun addCustomGenre(name: String) {
+        viewModelScope.launch {
+            val newGenre = bookRepository.addCustomGenre(name)
+            updateBookItem {
+                copy(genre = newGenre)
             }
         }
     }

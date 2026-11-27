@@ -3,6 +3,7 @@ package com.bc.home.book_in_progress.finish
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bc.core.navigation.INavigation
+import com.bc.model.repository.BookGenre
 import com.bc.model.repository.IBookRepository
 import com.bc.model.repository.ReadingStatus
 import dagger.assisted.Assisted
@@ -10,6 +11,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,6 +30,7 @@ class FinishBookViewModel @AssistedInject constructor(
 
     private val _uiState = MutableStateFlow(FinishBookUIState())
     val uiState = _uiState.asStateFlow()
+    val genres: StateFlow<List<BookGenre>> = bookRepository.genres
 
     init {
         loadBook()
@@ -46,6 +49,15 @@ class FinishBookViewModel @AssistedInject constructor(
 
             FinishBookUIAction.OnConfirm -> finishBook()
             FinishBookUIAction.OnBackPressed -> navigation.goBack()
+            is FinishBookUIAction.OnCustomGenreAdded -> {
+                addCustomGenre(action.name)
+            }
+
+            is FinishBookUIAction.OnGenreChanged -> {
+                update {
+                    copy(genre = action.genre)
+                }
+            }
         }
     }
 
@@ -57,13 +69,21 @@ class FinishBookViewModel @AssistedInject constructor(
 
     private fun loadBook() {
         viewModelScope.launch {
-            val book = bookRepository.getBookById(bookId)
-
-            _uiState.update {
-                it.copy(
-                    book = book,
-                    isLoading = false,
-                )
+            runCatching {
+                bookRepository.getBookById(bookId)
+            }.onSuccess { book ->
+                _uiState.update {
+                    it.copy(
+                        book = book,
+                        genre = book?.genre,
+                        rating = book?.rating ?: 0f,
+                        summary = book?.summary.orEmpty(),
+                        note = book?.note.orEmpty(),
+                        isLoading = false,
+                    )
+                }
+            }.onFailure {
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -80,6 +100,7 @@ class FinishBookViewModel @AssistedInject constructor(
                     book.copy(
                         status = ReadingStatus.ALREADY_READ,
                         currentPage = book.totalPages ?: book.currentPage,
+                        genre = genres.value.find { it.id == state.genre?.id },
                         rating = state.rating,
                         summary = state.summary.trim(),
                         note = state.note.trim(),
@@ -92,6 +113,15 @@ class FinishBookViewModel @AssistedInject constructor(
                 _uiState.update { state ->
                     state.copy(isSaving = false)
                 }
+            }
+        }
+    }
+
+    fun addCustomGenre(name: String) {
+        viewModelScope.launch {
+            val newGenre = bookRepository.addCustomGenre(name)
+            update {
+                copy(genre = newGenre)
             }
         }
     }

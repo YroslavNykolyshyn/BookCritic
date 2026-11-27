@@ -2,6 +2,7 @@ package com.bc.model.repository
 
 import android.net.Uri
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface IBookRepository {
     fun observeBooks(): Flow<List<BookData>>
@@ -17,4 +18,10 @@ interface IBookRepository {
     suspend fun updateBook(book: BookData)
 
     suspend fun toggleFavorite(bookId: String)
+
+    // Genre
+    val genres: StateFlow<List<BookGenre>>
+    suspend fun addCustomGenre(name: String): BookGenre
+
+    suspend fun seedPredefinedGenres()
 }

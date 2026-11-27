@@ -7,6 +7,7 @@ import com.bc.core.navigation.INavigation
 import com.bc.home.book_in_progress.add.BookInProgressItem
 import com.bc.home.book_in_progress.add.BookInProgressState
 import com.bc.model.repository.BookData
+import com.bc.model.repository.BookGenre
 import com.bc.model.repository.IBookRepository
 import com.bc.model.repository.ReadingStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,8 @@ class BookInProgressViewModel @Inject constructor(
 ): ViewModel() {
     private val _uiState = MutableStateFlow(BookInProgressState())
     val uiState: StateFlow<BookInProgressState> = _uiState.asStateFlow()
+
+    val genres: StateFlow<List<BookGenre>> = bookRepository.genres
 
     fun onAction(action: BookInProgressUIAction) {
         when(action) {
@@ -52,6 +55,15 @@ class BookInProgressViewModel @Inject constructor(
                     copy(author = action.value)
                 }
             }
+
+            is BookInProgressUIAction.OnAddCustomGenre -> {
+                addCustomGenre(action.value)
+            }
+            is BookInProgressUIAction.OnGenreSelected -> {
+               updateBookItem {
+                   copy(genre = action.value)
+               }
+            }
         }
     }
 
@@ -67,10 +79,20 @@ class BookInProgressViewModel @Inject constructor(
                     status = ReadingStatus.READING,
                     totalPages = item.totalPages.toLong(),
                     currentPage = item.currentPage.toLong(),
+                    genre = item.genre,
                 ),
                 selectedCoverUri = item.selectedCoverUri?.let(Uri::parse),
             )
             navigation.goBack()
+        }
+    }
+
+    fun addCustomGenre(name: String) {
+        viewModelScope.launch {
+            val newGenre = bookRepository.addCustomGenre(name)
+            updateBookItem {
+                copy(genre = newGenre)
+            }
         }
     }
 

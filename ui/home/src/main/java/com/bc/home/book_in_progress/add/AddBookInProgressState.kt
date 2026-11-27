@@ -1,5 +1,6 @@
 package com.bc.home.book_in_progress.add
 
+import com.bc.model.repository.BookGenre
 import com.bc.model.repository.ReadingStatus
 
 data class BookInProgressState(
@@ -15,4 +16,5 @@ data class BookInProgressItem(
     val totalPages: Int = 0,
     val bookStatus: ReadingStatus = ReadingStatus.READING,
     val selectedCoverUri: String? = null,
-    )
+    val genre: BookGenre? = null,
+)

@@ -64,6 +64,8 @@ import com.bc.core.theme.DMSerifDisplay
 import com.bc.core.theme.MaterialAppTheme
 import com.bc.core.widgets.AppCircularLoadingIndicator
 import com.bc.core.widgets.SwipeableBookItem
+import com.bc.core.widgets.displayName
+import com.bc.model.repository.BookGenre
 
 @Composable
 fun LibraryScreen(
@@ -213,6 +215,16 @@ private fun LibraryBookItem(
                 maxLines = 1,
                 overflow = TextOverflow.Clip,
             )
+
+            if (book.genre != null) {
+                Text(
+                    text = book.genre.displayName(),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.textSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Clip,
+                )
+            }
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -444,6 +456,7 @@ private fun LibraryScreenPreview() {
                                 id = "1",
                                 title = "The Midnight Library",
                                 author = "Matt Haig",
+                                genre = BookGenre("", ""),
                                 rating = 4.5f,
                                 coverPath = null,
                                 bookSummary = "",
@@ -453,7 +466,7 @@ private fun LibraryScreenPreview() {
                                 id = "2",
                                 title = "Atomic Habits",
                                 author = "James Clear",
-                                rating = 5f,
+                                genre = BookGenre("", ""),                                rating = 5f,
                                 coverPath = null,
                                 bookSummary = "",
                                 bookOptionalSummary = "",
@@ -462,7 +475,7 @@ private fun LibraryScreenPreview() {
                                 id = "3",
                                 title = "1984",
                                 author = "George Orwell",
-                                rating = 4f,
+                                genre = BookGenre("", ""),                                rating = 4f,
                                 coverPath = null,
                                 bookSummary = "",
                                 bookOptionalSummary = "",

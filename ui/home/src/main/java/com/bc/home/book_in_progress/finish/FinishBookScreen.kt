@@ -10,11 +10,13 @@ import com.bc.core.R
 import com.bc.core.widgets.AppBottomBarButton
 import com.bc.core.widgets.AppTopBar
 import com.bc.core.widgets.BookContentLayout
+import com.bc.model.repository.BookGenre
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FinishBookScreen(
     state: FinishBookUIState,
+    genres: List<BookGenre> = emptyList(),
     onAction: (FinishBookUIAction) -> Unit,
 ) {
     val isKeyBoardVisible = WindowInsets.isImeVisible
@@ -45,7 +47,7 @@ fun FinishBookScreen(
             summary = state.summary,
             note = state.note,
             onTitleChanged = { },
-            onAuthorChanged = {  },
+            onAuthorChanged = { },
             onRatingChanged = { onAction(FinishBookUIAction.OnRatingChanged(it)) },
             onStartedDateChanged = { },
             onFinishedDateChanged = { },
@@ -55,6 +57,14 @@ fun FinishBookScreen(
 
             },
             selectedCoverUri = "",
+            genres = genres,
+            selectedGenreId = state.genre?.id,
+            onGenreSelected = {
+                onAction(FinishBookUIAction.OnGenreChanged(it))
+            },
+            onAddCustomGenre = {
+                onAction(FinishBookUIAction.OnCustomGenreAdded(it))
+            },
         )
     }
 }

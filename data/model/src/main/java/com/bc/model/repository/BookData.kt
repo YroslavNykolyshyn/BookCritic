@@ -4,6 +4,7 @@ data class BookData(
     val id: String,
     val title: String,
     val author: String,
+    val genre: BookGenre? = null,
     val status: ReadingStatus = ReadingStatus.ALREADY_READ,
     val rating: Float? = null,
     val startedDate: Long? = null,
