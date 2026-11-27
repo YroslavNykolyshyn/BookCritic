@@ -31,6 +31,7 @@ class FinishBookViewModel @AssistedInject constructor(
 
     init {
         loadBook()
+        observeGenres()
     }
 
     fun onAction(action: FinishBookUIAction) {
@@ -46,6 +47,15 @@ class FinishBookViewModel @AssistedInject constructor(
 
             FinishBookUIAction.OnConfirm -> finishBook()
             FinishBookUIAction.OnBackPressed -> navigation.goBack()
+            is FinishBookUIAction.OnCustomGenreAdded -> {
+                addCustomGenre(action.name)
+            }
+
+            is FinishBookUIAction.OnGenreChanged -> {
+                update {
+                    copy(genre = action.genre)
+                }
+            }
         }
     }
 
@@ -57,13 +67,21 @@ class FinishBookViewModel @AssistedInject constructor(
 
     private fun loadBook() {
         viewModelScope.launch {
-            val book = bookRepository.getBookById(bookId)
-
-            _uiState.update {
-                it.copy(
-                    book = book,
-                    isLoading = false,
-                )
+            runCatching {
+                bookRepository.getBookById(bookId)
+            }.onSuccess { book ->
+                _uiState.update {
+                    it.copy(
+                        book = book,
+                        genre = book?.genre,
+                        rating = book?.rating ?: 0f,
+                        summary = book?.summary.orEmpty(),
+                        note = book?.note.orEmpty(),
+                        isLoading = false,
+                    )
+                }
+            }.onFailure {
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -80,6 +98,7 @@ class FinishBookViewModel @AssistedInject constructor(
                     book.copy(
                         status = ReadingStatus.ALREADY_READ,
                         currentPage = book.totalPages ?: book.currentPage,
+                        genre = state.genres.find { it.id == state.genre?.id },
                         rating = state.rating,
                         summary = state.summary.trim(),
                         note = state.note.trim(),
@@ -92,6 +111,25 @@ class FinishBookViewModel @AssistedInject constructor(
                 _uiState.update { state ->
                     state.copy(isSaving = false)
                 }
+            }
+        }
+    }
+
+    private fun observeGenres() {
+        viewModelScope.launch {
+            bookRepository.observeGenres().collect { genres ->
+                update {
+                    copy(genres = genres)
+                }
+            }
+        }
+    }
+
+    fun addCustomGenre(name: String) {
+        viewModelScope.launch {
+            val newGenre = bookRepository.addCustomGenre(name)
+            update {
+                copy(genre = newGenre)
             }
         }
     }

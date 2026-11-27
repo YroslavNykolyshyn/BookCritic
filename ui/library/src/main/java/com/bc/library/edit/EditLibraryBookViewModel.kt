@@ -34,6 +34,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
 
     init {
         loadData()
+        observeGenres()
     }
 
     fun loadData() {
@@ -56,6 +57,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
                             bookItem = EditLibraryBookItem(
                                 title = book.title,
                                 author = book.author,
+                                genre = book.genre,
                                 rating = book.rating ?: 0f,
                                 startedDate = book.startedDate,
                                 finishedDate = book.finishedDate,
@@ -129,6 +131,13 @@ class EditLibraryBookViewModel @AssistedInject constructor(
             is EditLibraryBookUIAction.OnNoteChanged -> updateBookItem {
                 copy(note = action.value)
             }
+
+            is EditLibraryBookUIAction.OnCustomGenreAdded -> {
+                addCustomGenre(action.name)
+            }
+            is EditLibraryBookUIAction.OnGenreChanged -> updateBookItem {
+                copy(genre = action.genre)
+            }
         }
     }
 
@@ -155,6 +164,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
                 id = bookId,
                 title = item.title,
                 author = item.author,
+                genre = item.genre,
                 rating = item.rating,
                 startedDate = item.startedDate,
                 finishedDate = item.finishedDate,
@@ -187,6 +197,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
 
         return current.title != original.title ||
                 current.author != original.author ||
+                current.genre?.id != original.genre?.id ||
                 current.rating != (original.rating ?: 0f) ||
                 current.startedDate != original.startedDate ||
                 current.finishedDate != original.finishedDate ||
@@ -195,6 +206,27 @@ class EditLibraryBookViewModel @AssistedInject constructor(
                 current.bookCover != original.coverPath ||
                 current.selectedCoverUri != null ||
                 current.bookCost.trim().toLongOrNull() != original.bookCost
+    }
+
+    private fun observeGenres() {
+        viewModelScope.launch {
+            repository.observeGenres().collect { genres ->
+                _uiState.update { state ->
+                    state.copy(
+                        genres = genres,
+                    )
+                }
+            }
+        }
+    }
+
+    fun addCustomGenre(name: String) {
+        viewModelScope.launch {
+            val newGenre = repository.addCustomGenre(name)
+            updateBookItem {
+                copy(genre = newGenre)
+            }
+        }
     }
 
     private fun updateBookItem(

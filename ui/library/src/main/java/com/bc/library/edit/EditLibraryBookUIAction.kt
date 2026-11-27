@@ -1,6 +1,7 @@
 package com.bc.library.edit
 
 import android.net.Uri
+import com.bc.model.repository.BookGenre
 
 sealed interface EditLibraryBookUIAction {
     data object BackClicked : EditLibraryBookUIAction
@@ -16,4 +17,6 @@ sealed interface EditLibraryBookUIAction {
     data class OnFinishedDateChanged(val value: Long?) : EditLibraryBookUIAction
     data class OnSummaryChanged(val value: String) : EditLibraryBookUIAction
     data class OnNoteChanged(val value: String) : EditLibraryBookUIAction
+    data class OnGenreChanged(val genre: BookGenre?) : EditLibraryBookUIAction
+    data class OnCustomGenreAdded(val name: String) : EditLibraryBookUIAction
 }

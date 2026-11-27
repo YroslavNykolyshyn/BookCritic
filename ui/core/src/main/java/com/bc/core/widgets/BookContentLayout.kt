@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.bc.core.theme.AppTheme
 import com.bc.core.theme.AppTheme.colors
+import com.bc.model.repository.BookGenre
 import com.bc.core.R as CoreR
 
 @Composable
@@ -46,6 +47,8 @@ fun BookContentLayout(
     finishedDate: Long?,
     summary: String,
     note: String,
+    genres: List<BookGenre>,
+    selectedGenreId: String?,
     onTitleChanged: (String) -> Unit,
     onAuthorChanged: (String) -> Unit,
     onRatingChanged: (Float) -> Unit,
@@ -54,6 +57,8 @@ fun BookContentLayout(
     onSummaryChanged: (String) -> Unit,
     onNoteChanged: (String) -> Unit,
     onCoverChange: () -> Unit,
+    onGenreSelected: (BookGenre?) -> Unit,
+    onAddCustomGenre: (String) -> Unit,
     paddingValues: PaddingValues,
     selectedCoverUri: String?,
     isPinned: Boolean = false,
@@ -198,6 +203,19 @@ fun BookContentLayout(
                 },
                 readOnly = !isEditable,
             )
+
+            // Genre
+            if (isEditable || selectedGenreId != null) {
+                BookGenreDropdown(
+                    genres = genres,
+                    selectedGenreId = selectedGenreId,
+                    onGenreSelected = { genreId ->
+                        onGenreSelected(genres.firstOrNull { it.id == genreId })
+                    },
+                    onAddCustomGenre = onAddCustomGenre,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
 
             // Personal Rating
             if (isEditable) {

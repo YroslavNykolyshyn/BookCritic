@@ -29,54 +29,63 @@ class AddBookViewModel @Inject constructor(
 
     init {
         observeReadBookCount()
+        observeGenres()
     }
 
     fun onAction(action: AddBookUIAction) {
         when (action) {
-            AddBookUIAction.BackClicked -> {
+            AddBookUIAction.OnBackClicked -> {
                 navigation.goBack()
             }
 
-            is AddBookUIAction.CoverSelected -> {
+            is AddBookUIAction.OnCoverSelected -> {
                 onCoverSelected(action.uri)
             }
 
-            AddBookUIAction.SaveClicked -> {
+            AddBookUIAction.OnSaveClicked -> {
                 viewModelScope.launch {
                     saveBook()
                 }
             }
 
-            is AddBookUIAction.TitleChanged -> updateBookItem {
+            is AddBookUIAction.OnTitleChanged -> updateBookItem {
                 copy(title = action.value)
             }
 
-            is AddBookUIAction.AuthorChanged -> updateBookItem {
+            is AddBookUIAction.OnAuthorChanged -> updateBookItem {
                 copy(author = action.value)
             }
 
-            is AddBookUIAction.StatusChanged -> updateBookItem {
+            is AddBookUIAction.OnStatusChanged -> updateBookItem {
                 copy(status = action.value)
             }
 
-            is AddBookUIAction.RatingChanged -> updateBookItem {
+            is AddBookUIAction.OnRatingChanged -> updateBookItem {
                 copy(rating = action.value)
             }
 
-            is AddBookUIAction.StartedDateChanged -> updateBookItem {
+            is AddBookUIAction.OnStartedDateChanged -> updateBookItem {
                 copy(startedDate = action.value)
             }
 
-            is AddBookUIAction.FinishedDateChanged -> updateBookItem {
+            is AddBookUIAction.OnFinishedDateChanged -> updateBookItem {
                 copy(finishedDate = action.value)
             }
 
-            is AddBookUIAction.SummaryChanged -> updateBookItem {
+            is AddBookUIAction.OnSummaryChanged -> updateBookItem {
                 copy(summary = action.value)
             }
 
-            is AddBookUIAction.NoteChanged -> updateBookItem {
+            is AddBookUIAction.OnNoteChanged -> updateBookItem {
                 copy(note = action.value)
+            }
+
+            is AddBookUIAction.OnGenreChanged -> updateBookItem {
+                copy(genre = action.genre)
+            }
+
+            is AddBookUIAction.OnCustomGenreAdded -> {
+                addCustomGenre(action.name)
             }
         }
     }
@@ -99,6 +108,7 @@ class AddBookViewModel @Inject constructor(
                 id = UUID.randomUUID().toString(),
                 title = title,
                 author = item.author.trim(),
+                genre = item.genre,
                 status = item.status,
                 rating = item.rating,
                 startedDate = item.startedDate,
@@ -140,6 +150,25 @@ class AddBookViewModel @Inject constructor(
                         readBookCount = count
                     )
                 }
+            }
+        }
+    }
+
+    private fun observeGenres() {
+        viewModelScope.launch {
+            bookRepository.observeGenres().collect { genres ->
+                update {
+                    copy(genres = genres)
+                }
+            }
+        }
+    }
+
+    fun addCustomGenre(name: String) {
+        viewModelScope.launch {
+            val newGenre = bookRepository.addCustomGenre(name)
+            updateBookItem {
+                copy(genre = newGenre)
             }
         }
     }

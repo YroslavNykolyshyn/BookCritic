@@ -45,7 +45,7 @@ fun AddBookScreen(
         contract = ActivityResultContracts.PickVisualMedia(),
     ) { uri ->
         uri?.let {
-            onAction(AddBookUIAction.CoverSelected(it))
+            onAction(AddBookUIAction.OnCoverSelected(it))
         }
     }
 
@@ -56,7 +56,7 @@ fun AddBookScreen(
     ) { success ->
         if (success) {
             cameraUri?.let {
-                onAction(AddBookUIAction.CoverSelected(it))
+                onAction(AddBookUIAction.OnCoverSelected(it))
             }
         }
     }
@@ -70,7 +70,7 @@ fun AddBookScreen(
             AppTopBar(
                 title = stringResource(R.string.add_book_title),
                 onAction = {
-                    onAction(AddBookUIAction.BackClicked)
+                    onAction(AddBookUIAction.OnBackClicked)
                 },
                 enabled = !state.isSaving,
             )
@@ -78,7 +78,7 @@ fun AddBookScreen(
         bottomBar = {
             AppBottomBarButton(
                 visible = isKeyBoardVisible,
-                onSaveClicked = { onAction(AddBookUIAction.SaveClicked) },
+                onSaveClicked = { onAction(AddBookUIAction.OnSaveClicked) },
                 buttonEnabled = state.isSaving,
                 readBookCount = state.readBookCount,
             )
@@ -111,20 +111,28 @@ fun AddBookScreen(
             paddingValues = paddingValues,
             title = state.bookItem.title,
             author = state.bookItem.author,
+            genres = state.genres,
+            selectedGenreId = state.bookItem.genre?.id,
             rating = state.bookItem.rating,
             startedDate = state.bookItem.startedDate,
             finishedDate = state.bookItem.finishedDate,
             summary = state.bookItem.summary,
             note = state.bookItem.note,
-            onTitleChanged = { onAction(AddBookUIAction.TitleChanged(it)) },
-            onAuthorChanged = { onAction(AddBookUIAction.AuthorChanged(it)) },
-            onRatingChanged = { onAction(AddBookUIAction.RatingChanged(it)) },
-            onStartedDateChanged = { onAction(AddBookUIAction.StartedDateChanged(it)) },
-            onFinishedDateChanged = { onAction(AddBookUIAction.FinishedDateChanged(it)) },
-            onSummaryChanged = { onAction(AddBookUIAction.SummaryChanged(it)) },
-            onNoteChanged = { onAction(AddBookUIAction.NoteChanged(it)) },
+            onTitleChanged = { onAction(AddBookUIAction.OnTitleChanged(it)) },
+            onAuthorChanged = { onAction(AddBookUIAction.OnAuthorChanged(it)) },
+            onRatingChanged = { onAction(AddBookUIAction.OnRatingChanged(it)) },
+            onStartedDateChanged = { onAction(AddBookUIAction.OnStartedDateChanged(it)) },
+            onFinishedDateChanged = { onAction(AddBookUIAction.OnFinishedDateChanged(it)) },
+            onSummaryChanged = { onAction(AddBookUIAction.OnSummaryChanged(it)) },
+            onNoteChanged = { onAction(AddBookUIAction.OnNoteChanged(it)) },
             onCoverChange = {
                 showImageSourceSheet = true
+            },
+            onGenreSelected = {
+                onAction(AddBookUIAction.OnGenreChanged(it))
+            },
+            onAddCustomGenre = {
+                onAction(AddBookUIAction.OnCustomGenreAdded(it))
             },
             selectedCoverUri = state.bookItem.selectedCoverUri,
         )

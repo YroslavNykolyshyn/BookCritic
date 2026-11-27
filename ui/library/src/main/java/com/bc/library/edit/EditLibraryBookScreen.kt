@@ -121,6 +121,8 @@ fun EditLibraryBookScreen(
                 paddingValues = paddingValues,
                 title = state.bookItem.title,
                 author = state.bookItem.author,
+                genres = state.genres,
+                selectedGenreId = state.bookItem.genre?.id,
                 rating = state.bookItem.rating,
                 startedDate = state.bookItem.startedDate,
                 finishedDate = state.bookItem.finishedDate,
@@ -137,6 +139,8 @@ fun EditLibraryBookScreen(
                 onCoverChange = {
                     showImageSourceSheet = true
                 },
+                onGenreSelected = { onAction(EditLibraryBookUIAction.OnGenreChanged(it)) },
+                onAddCustomGenre = { onAction(EditLibraryBookUIAction.OnCustomGenreAdded(it)) },
                 selectedCoverUri = state.bookItem.selectedCoverUri
                     ?: state.bookItem.bookCover,
             )

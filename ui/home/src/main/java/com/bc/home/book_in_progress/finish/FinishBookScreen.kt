@@ -45,7 +45,7 @@ fun FinishBookScreen(
             summary = state.summary,
             note = state.note,
             onTitleChanged = { },
-            onAuthorChanged = {  },
+            onAuthorChanged = { },
             onRatingChanged = { onAction(FinishBookUIAction.OnRatingChanged(it)) },
             onStartedDateChanged = { },
             onFinishedDateChanged = { },
@@ -55,6 +55,14 @@ fun FinishBookScreen(
 
             },
             selectedCoverUri = "",
+            genres = state.genres,
+            selectedGenreId = state.genre?.id,
+            onGenreSelected = {
+                onAction(FinishBookUIAction.OnGenreChanged(it))
+            },
+            onAddCustomGenre = {
+                onAction(FinishBookUIAction.OnCustomGenreAdded(it))
+            },
         )
     }
 }

@@ -1,6 +1,7 @@
 package com.bc.home.book_in_progress.finish
 
 import com.bc.model.repository.BookData
+import com.bc.model.repository.BookGenre
 
 data class FinishBookUIState(
     val isLoading: Boolean = true,
@@ -9,4 +10,6 @@ data class FinishBookUIState(
     val rating: Float = 0f,
     val summary: String = "",
     val note: String = "",
+    val genres: List<BookGenre> = emptyList(),
+    val genre: BookGenre? = null,
 )

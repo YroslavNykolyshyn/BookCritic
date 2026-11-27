@@ -1,21 +1,24 @@
 package com.bc.library.add
 
 import android.net.Uri
+import com.bc.model.repository.BookGenre
 import com.bc.model.repository.ReadingStatus
 
 
 sealed interface AddBookUIAction {
-    data object BackClicked : AddBookUIAction
+    data object OnBackClicked : AddBookUIAction
 
-    data class CoverSelected(val uri: Uri) : AddBookUIAction
-    data object SaveClicked : AddBookUIAction
+    data class OnCoverSelected(val uri: Uri) : AddBookUIAction
+    data object OnSaveClicked : AddBookUIAction
 
-    data class TitleChanged(val value: String) : AddBookUIAction
-    data class AuthorChanged(val value: String) : AddBookUIAction
-    data class StatusChanged(val value: ReadingStatus) : AddBookUIAction
-    data class RatingChanged(val value: Float) : AddBookUIAction
-    data class StartedDateChanged(val value: Long?) : AddBookUIAction
-    data class FinishedDateChanged(val value: Long?) : AddBookUIAction
-    data class SummaryChanged(val value: String) : AddBookUIAction
-    data class NoteChanged(val value: String) : AddBookUIAction
+    data class OnTitleChanged(val value: String) : AddBookUIAction
+    data class OnAuthorChanged(val value: String) : AddBookUIAction
+    data class OnStatusChanged(val value: ReadingStatus) : AddBookUIAction
+    data class OnRatingChanged(val value: Float) : AddBookUIAction
+    data class OnStartedDateChanged(val value: Long?) : AddBookUIAction
+    data class OnFinishedDateChanged(val value: Long?) : AddBookUIAction
+    data class OnSummaryChanged(val value: String) : AddBookUIAction
+    data class OnNoteChanged(val value: String) : AddBookUIAction
+    data class OnGenreChanged(val genre: BookGenre?) : AddBookUIAction
+    data class OnCustomGenreAdded(val name: String) : AddBookUIAction
 }

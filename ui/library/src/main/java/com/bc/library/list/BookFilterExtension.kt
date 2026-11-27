@@ -33,6 +33,7 @@ fun BookData.toUiModel(): LibraryBookUiModel {
         id = id,
         title = title,
         author = author,
+        genre = genre,
         rating = rating,
         coverPath = coverPath,
         bookSummary = summary ?: "",
