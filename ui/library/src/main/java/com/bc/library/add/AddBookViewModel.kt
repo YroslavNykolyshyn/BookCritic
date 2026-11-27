@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bc.core.navigation.INavigation
 import com.bc.model.repository.BookData
+import com.bc.model.repository.BookGenre
 import com.bc.model.repository.IBookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -26,10 +27,10 @@ class AddBookViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(AddBookUiState())
     val uiState: StateFlow<AddBookUiState> = _uiState.asStateFlow()
+    val genres: StateFlow<List<BookGenre>> = bookRepository.genres
 
     init {
         observeReadBookCount()
-        observeGenres()
     }
 
     fun onAction(action: AddBookUIAction) {
@@ -149,16 +150,6 @@ class AddBookViewModel @Inject constructor(
                     state.copy(
                         readBookCount = count
                     )
-                }
-            }
-        }
-    }
-
-    private fun observeGenres() {
-        viewModelScope.launch {
-            bookRepository.observeGenres().collect { genres ->
-                update {
-                    copy(genres = genres)
                 }
             }
         }

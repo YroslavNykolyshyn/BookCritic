@@ -54,11 +54,13 @@ import com.bc.core.widgets.AppTextInput
 import com.bc.core.widgets.AppTopBar
 import com.bc.core.widgets.BookGenreDropdown
 import com.bc.home.book_in_progress.BookInProgressUIAction
+import com.bc.model.repository.BookGenre
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BookInProgressScreen(
     state: BookInProgressState,
+    genres: List<BookGenre> = emptyList(),
     onAction: (BookInProgressUIAction) -> Unit,
 ) {
     var showImageSourceSheet by remember {
@@ -223,10 +225,10 @@ fun BookInProgressScreen(
                 )
 
                 BookGenreDropdown(
-                    genres = state.genres,
+                    genres = genres,
                     selectedGenreId = state.bookInProgressItem.genre?.id,
                     onGenreSelected = { genreId ->
-                        onAction(BookInProgressUIAction.OnGenreSelected(state.genres.firstOrNull { it.id == genreId }))
+                        onAction(BookInProgressUIAction.OnGenreSelected(genres.firstOrNull { it.id == genreId }))
                     },
                     onAddCustomGenre = { onAction(BookInProgressUIAction.OnAddCustomGenre(it)) },
                 )

@@ -7,7 +7,6 @@ data class AddBookUiState(
     val isSaving: Boolean = false,
     val bookItem: AddBookItem = AddBookItem(),
     val readBookCount: Int = 0,
-    val genres: List<BookGenre> = emptyList(),
     )
 
 data class AddBookItem(

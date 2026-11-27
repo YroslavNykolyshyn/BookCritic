@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bc.core.navigation.INavigation
 import com.bc.model.repository.BookData
+import com.bc.model.repository.BookGenre
 import com.bc.model.repository.IBookRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -20,12 +21,13 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = EditLibraryBookViewModel.Factory::class)
 class EditLibraryBookViewModel @AssistedInject constructor(
     @Assisted val bookId: String,
-    private val repository: IBookRepository,
+    private val bookRepository: IBookRepository,
     private val navigation: INavigation,) : ViewModel() {
     private val _uiState = MutableStateFlow(EditLibraryBookUIState())
     val uiState: StateFlow<EditLibraryBookUIState> = _uiState.asStateFlow()
 
     private var originalBook: BookData? = null
+    val genres: StateFlow<List<BookGenre>> = bookRepository.genres
 
     @AssistedFactory
     interface Factory {
@@ -34,7 +36,6 @@ class EditLibraryBookViewModel @AssistedInject constructor(
 
     init {
         loadData()
-        observeGenres()
     }
 
     fun loadData() {
@@ -44,7 +45,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
             }
 
             try {
-                val book = repository.getBookById(bookId)
+                val book = bookRepository.getBookById(bookId)
                 originalBook = book
 
                 _uiState.update { currentState ->
@@ -177,7 +178,7 @@ class EditLibraryBookViewModel @AssistedInject constructor(
 
             val selectedCoverUri = item.selectedCoverUri?.let(Uri::parse)
 
-            repository.saveBook(
+            bookRepository.saveBook(
                 book = bookItem,
                 selectedCoverUri = selectedCoverUri,
             )
@@ -208,21 +209,9 @@ class EditLibraryBookViewModel @AssistedInject constructor(
                 current.bookCost.trim().toLongOrNull() != original.bookCost
     }
 
-    private fun observeGenres() {
-        viewModelScope.launch {
-            repository.observeGenres().collect { genres ->
-                _uiState.update { state ->
-                    state.copy(
-                        genres = genres,
-                    )
-                }
-            }
-        }
-    }
-
     fun addCustomGenre(name: String) {
         viewModelScope.launch {
-            val newGenre = repository.addCustomGenre(name)
+            val newGenre = bookRepository.addCustomGenre(name)
             updateBookItem {
                 copy(genre = newGenre)
             }

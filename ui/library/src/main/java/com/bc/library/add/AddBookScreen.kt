@@ -26,14 +26,16 @@ import com.bc.core.widgets.AppCircularLoadingIndicator
 import com.bc.core.widgets.AppModalBottomSheet
 import com.bc.core.widgets.AppTopBar
 import com.bc.core.widgets.BookContentLayout
+import com.bc.model.repository.BookGenre
 
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AddBookScreen(
-    state: AddBookUiState,
-    onAction: (AddBookUIAction) -> Unit,
     modifier: Modifier = Modifier,
+    state: AddBookUiState,
+    genres: List<BookGenre> = emptyList(),
+    onAction: (AddBookUIAction) -> Unit,
 ) {
     var showImageSourceSheet by remember {
         mutableStateOf(false)
@@ -111,7 +113,7 @@ fun AddBookScreen(
             paddingValues = paddingValues,
             title = state.bookItem.title,
             author = state.bookItem.author,
-            genres = state.genres,
+            genres = genres,
             selectedGenreId = state.bookItem.genre?.id,
             rating = state.bookItem.rating,
             startedDate = state.bookItem.startedDate,

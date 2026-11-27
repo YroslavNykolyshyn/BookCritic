@@ -10,6 +10,5 @@ data class FinishBookUIState(
     val rating: Float = 0f,
     val summary: String = "",
     val note: String = "",
-    val genres: List<BookGenre> = emptyList(),
     val genre: BookGenre? = null,
 )

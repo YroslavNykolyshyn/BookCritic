@@ -6,7 +6,6 @@ data class EditLibraryBookUIState(
     val isLoading: Boolean = false,
     val bookItem: EditLibraryBookItem = EditLibraryBookItem(),
     val isEditing: Boolean = false,
-    val genres: List<BookGenre> = emptyList(),
     )
 
 data class EditLibraryBookItem(

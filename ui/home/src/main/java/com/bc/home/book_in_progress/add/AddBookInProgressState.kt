@@ -6,7 +6,6 @@ import com.bc.model.repository.ReadingStatus
 data class BookInProgressState(
     val bookInProgressItem: BookInProgressItem = BookInProgressItem(),
     val isSaving: Boolean = false,
-    val genres: List<BookGenre> = emptyList(),
 )
 
 data class BookInProgressItem(

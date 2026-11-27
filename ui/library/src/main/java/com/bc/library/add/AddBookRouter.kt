@@ -10,9 +10,11 @@ fun AddBookRouter(
     viewModel: AddBookViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val genres by viewModel.genres.collectAsStateWithLifecycle()
 
     AddBookScreen(
         state = state,
+        genres = genres,
         onAction = viewModel::onAction,
     )
 }
